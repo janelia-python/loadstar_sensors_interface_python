@@ -1,4 +1,4 @@
-from serial_inteface import SerialInterface
+from serial_interface import SerialInterface
 
 
 DEBUG = False
@@ -13,3 +13,4 @@ class LoadstarSensorsInterface():
         else:
             kwargs.update({'debug': DEBUG})
             self.debug = DEBUG
+        self._serial_interface = SerialInterface(*args,**kwargs)
