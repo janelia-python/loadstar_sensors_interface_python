@@ -56,10 +56,21 @@ peter@polidoro.io
 serial_interface
 #+END_SRC
 
+#+NAME: reference-name
+#+BEGIN_SRC text :exports none :noweb yes
+Loadstar Sensors
+#+END_SRC
+
+#+NAME: reference-link
+#+BEGIN_SRC text :exports none :noweb yes
+https://www.loadstarsensors.com/
+#+END_SRC
+
 #+BEGIN_EXAMPLE
-<!-- README.me is generated automatically from .single-source-of-truth.org
+<!-- README.md is generated automatically from .single-source-of-truth.org
 File edits may be overwritten! -->
 #+END_EXAMPLE
+
 * About
 
 #+BEGIN_SRC text :noweb yes
@@ -71,22 +82,28 @@ File edits may be overwritten! -->
 - Author: <<author>>
 - Email: <<email>>
 - Copyright: <<copyright>>
+- Reference: [<<reference-name>>](<<reference-link>>)
 - Dependencies:
   - <<dependencies>>
 #+END_SRC
-
-* More Information
-
-This library is an interface to [[https://www.loadstarsensors.com/][Loadstar Sensors]] USB devices.
 
 * Example Usage
 
 #+BEGIN_SRC python
 from loadstar_sensors_interface import LoadstarSensorsInterface
 dev = LoadstarSensorsInterface() # Try to automatically detect port
-dev = LoadstarSensorsInterface(port='/dev/ttyACM0') # Linux specific port
+dev = LoadstarSensorsInterface(port='/dev/ttyUSB0') # Linux specific port
 dev = LoadstarSensorsInterface(port='/dev/tty.usbmodem262471') # Mac OS X specific port
 dev = LoadstarSensorsInterface(port='COM3') # Windows specific port
+
+dev.tare()
+sensor_value = dev.get_sensor_value()
+
+model = dev.get_model()
+id = dev.get_id()
+units = dev.get_units()
+load_capactiy = dev.get_load_capacity()
+gain = dev.get_gain()
 
 #+END_SRC
 
@@ -94,12 +111,30 @@ dev = LoadstarSensorsInterface(port='COM3') # Windows specific port
 
 [[https://github.com/janelia-pypi/python_setup]]
 
-** Linux and Mac OS X
+** Linux
+
+*** udev rules
+
+#+BEGIN_SRC sh :noweb yes
+sudo cp 77-loadstar-sensors.rules /etc/udev/rules.d/
+#+END_SRC
+
+*** pip
 
 #+BEGIN_SRC sh :noweb yes
 python3 -m venv ~/venvs/<<name>>
 source ~/venvs/<<name>>/bin/activate
 pip install <<name>>
+#+END_SRC
+
+*** guix
+
+Setup guix-janelia channel:
+
+https://github.com/guix-janelia/guix-janelia
+
+#+BEGIN_SRC sh :noweb yes
+guix install <<guix-name>>
 #+END_SRC
 
 ** Windows
@@ -110,14 +145,12 @@ C:\venvs\<<name>>\Scripts\activate
 pip install <<name>>
 #+END_SRC
 
-** Guix
-
-Setup guix-janelia channel:
-
-https://github.com/guix-janelia/guix-janelia
+* Test
 
 #+BEGIN_SRC sh :noweb yes
-guix install <<guix-name>>
+guix shell picocom
+picocom -b 9600 -f n -y n -d 8 -p 1 -c /dev/ttyUSB0
+?
 #+END_SRC
 
 * Development :noexport:
@@ -138,8 +171,30 @@ exit
 #+BEGIN_SRC text :tangle MANIFEST.in :exports none :noweb yes
 # MANIFEST.in is generated automatically from .single-source-of-truth.org
 # File edits may be overwritten!
+include 77-loadstar-sensors.rules
 include README.md
 include LICENSE
+#+END_SRC
+
+#+BEGIN_SRC text :tangle 77-loadstar-sensors.rules :exports none :noweb yes
+# 77-loadstar-sensors.rules is generated automatically from .single-source-of-truth.org
+# File edits may be overwritten!
+# UDEV Rules for <<reference-name>>, <<reference-link>>
+#
+# The latest version of this file may be found at:
+#   <<url>>
+#
+# This file must be placed at:
+#
+# /etc/udev/rules.d/77-loadstar-sensors.rules
+#
+# To install, type this command in a terminal:
+#   sudo cp 77-loadstar-sensors.rules /etc/udev/rules.d/
+#
+# After this file is installed, physically unplug and reconnect device.
+#
+# Original FT232/FT245 VID:PID
+ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", MODE="0666", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_PORT_IGNORE}="1"
 #+END_SRC
 
 #+BEGIN_SRC text :tangle pyproject.toml :exports none :noweb yes
