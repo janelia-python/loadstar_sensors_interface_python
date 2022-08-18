@@ -8,7 +8,7 @@ loadstar_sensors_interface
 
 #+NAME: version
 #+BEGIN_SRC text :exports none :noweb yes
-0.2.0
+0.3.0
 #+END_SRC
 
 #+NAME: repository-name
@@ -99,6 +99,9 @@ id = dev.get_id()
 units = dev.get_units()
 load_capactiy = dev.get_load_capacity()
 gain = dev.get_gain()
+dev.set_averaging_window(100) # 1-1024 samples
+dev.set_averaging_threshold(10) # 1-100 percent
+
 
 #+END_SRC
 
