@@ -13,7 +13,7 @@
 - Author: Peter Polidoro
 - Email: peter@polidoro.io
 - Copyright: 2022 Howard Hughes Medical Institute
-- Reference: [Loadstar Sensors](https://www.loadstarsensors.com/)
+- Reference: https://www.loadstarsensors.com/
 - Dependencies:
   - serial_interface
 ```

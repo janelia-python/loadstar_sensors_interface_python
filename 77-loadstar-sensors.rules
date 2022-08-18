@@ -1,6 +1,6 @@
 # 77-loadstar-sensors.rules is generated automatically from .single-source-of-truth.org
 # File edits may be overwritten!
-# UDEV Rules for Loadstar Sensors, https://www.loadstarsensors.com/
+# UDEV Rules for https://www.loadstarsensors.com/ devices.
 #
 # The latest version of this file may be found at:
 #   https://github.com/janelia-pypi/loadstar_sensors_interface_python
