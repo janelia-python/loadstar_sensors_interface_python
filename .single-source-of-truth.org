@@ -73,7 +73,7 @@ File edits may be overwritten! -->
 
 * About
 
-#+BEGIN_SRC text :noweb yes
+#+BEGIN_SRC markdown :noweb yes
 - Name: <<name>>
 - Version: <<version>>
 - Description: <<description>>
@@ -138,6 +138,14 @@ guix install <<guix-name>>
 #+END_SRC
 
 ** Windows
+
+*** drivers
+
+Download and install Windows driver:
+
+[[https://www.loadstarsensors.com/drivers-for-usb-load-cells-and-load-cell-interfaces.html][Loadstar Sensors Windows Driver]]
+
+*** pip
 
 #+BEGIN_SRC sh :noweb yes
 python3 -m venv C:\venvs\<<name>>
@@ -242,7 +250,7 @@ exclude =
 universal=1
 #+END_SRC
 
-#+BEGIN_SRC text :tangle setup.py :exports none :noweb yes
+#+BEGIN_SRC python :tangle setup.py :exports none :noweb yes
 # setup.py is generated automatically from .single-source-of-truth.org
 # File edits may be overwritten!
 from setuptools import setup

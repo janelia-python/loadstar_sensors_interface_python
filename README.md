@@ -4,7 +4,7 @@
 
 # About
 
-```text
+```markdown
 - Name: loadstar_sensors_interface
 - Version: 0.2.0
 - Description: Python interface to Loadstar Sensors USB devices.
@@ -76,6 +76,16 @@ guix install python-loadstar-sensors-interface
 
 
 ## Windows
+
+
+### drivers
+
+Download and install Windows driver:
+
+[Loadstar Sensors Windows Driver](https://www.loadstarsensors.com/drivers-for-usb-load-cells-and-load-cell-interfaces.html)
+
+
+### pip
 
 ```sh
 python3 -m venv C:\venvs\loadstar_sensors_interface
