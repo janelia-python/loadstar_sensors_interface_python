@@ -3,16 +3,16 @@ import serial
 from serial_interface import SerialInterface, ReadError
 
 
-DEBUG = True
+DEBUG = False
 
 class LoadstarSensorsInterface():
     '''
     Python interface to Loadstar Sensors USB devices.
     '''
-    _TIMEOUT = 0.1
-    _WRITE_TIMEOUT = 0.1
+    _TIMEOUT = 0.05
+    _WRITE_TIMEOUT = 0.05
     _WRITE_READ_DELAY = 0.010
-    _WRITE_WRITE_DELAY = 0.020
+    _WRITE_WRITE_DELAY = 0.010
     _REQUEST_EOL = '\r'
     _RESPONSE_EOL = b'\r\n'
     _READ_ATTEMPTS = 100
@@ -45,8 +45,8 @@ class LoadstarSensorsInterface():
                        'rtscts': False,
                        'dsrdtr': False
                        })
+        self._scale_factor = 1.0
         self._serial_interface = SerialInterface(*args,**kwargs)
-        self._debug = True
 
     def tare(self):
         for x in range(self._READ_ATTEMPTS):
@@ -62,7 +62,7 @@ class LoadstarSensorsInterface():
         for x in range(self._READ_ATTEMPTS):
             try:
                 response = self._send_request_get_response('w')
-                sensor_value = float(response)
+                sensor_value = float(response) * self._scale_factor
                 return sensor_value
             except ValueError:
                 self._debug_print('ValueError')
@@ -73,7 +73,7 @@ class LoadstarSensorsInterface():
         response = self._send_request_get_response('model')
         return response
 
-    def get_id(self):
+    def get_device_id(self):
         response = self._send_request_get_response('id')
         return response
 
@@ -83,26 +83,15 @@ class LoadstarSensorsInterface():
 
     def get_load_capacity(self):
         response = self._send_request_get_response('lc')
-        return response
-
-    def get_gain(self):
-        response = self._send_request_get_response('gain')
-        return response
+        load_capacity = float(response) * self._scale_factor
+        return load_capacity
 
     def set_averaging_window(self, averaging_window):
         if averaging_window < self._AVERAGING_WINDOW_MIN:
             averaging_window = self._AVERAGING_WINDOW_MIN
         if averaging_window > self._AVERAGING_WINDOW_MAX:
             averaging_window = self._AVERAGING_WINDOW_MAX
-        for x in range(self._READ_ATTEMPTS):
-            response = self._send_request_get_response('CSS ' + str(averaging_window))
-            print(response)
-            if response == self._GOOD_RESPONSE:
-                return True
-            else:
-                self._debug_print('bad response')
-                self._sleep()
-        return False
+        response = self._send_request_get_response('CSS ' + str(averaging_window))
 
     def set_averaging_threshold(self, averaging_threshold):
         if averaging_threshold < self._AVERAGING_THRESHOLD_MIN:
@@ -110,23 +99,27 @@ class LoadstarSensorsInterface():
         if averaging_threshold > self._AVERAGING_THRESHOLD_MAX:
             averaging_threshold = self._AVERAGING_THRESHOLD_MAX
         averaging_threshold = averaging_threshold/self._AVERAGING_THRESHOLD_MAX
-        for x in range(self._READ_ATTEMPTS):
-            response = self._send_request_get_response('CLA ' + str(averaging_threshold))
-            print(response)
-            if response == self._GOOD_RESPONSE:
-                return True
-            else:
-                self._debug_print('bad response')
-                self._sleep()
-        return False
+        response = self._send_request_get_response('CLA ' + str(averaging_threshold))
+
+    def get_scale_factor(self):
+        return self._scale_factor
+
+    def set_scale_factor(self, scale_factor):
+        self._scale_factor = float(scale_factor)
 
     def get_settings(self):
-        response = self._send_request_get_response('settings',use_readline=False)
-        settings = response.split(self._RESPONSE_EOL)
+        response = self._send_request_get_response('settings')
+        settings = []
+        for x in range(self._READ_ATTEMPTS):
+            response = self._serial_interface.readline()
+            if response == b'' or response == self._GOOD_RESPONSE:
+                break
+            else:
+                settings.append(response.strip())
         return settings
 
     def _send_request_get_response(self,request,use_readline=True):
-        # self._send_test_requests_until_response_is_valid()
+        self._send_test_requests_until_response_is_valid()
         return self._write_read(request,use_readline)
 
     def _write_read(self,request,use_readline=True):
@@ -140,7 +133,7 @@ class LoadstarSensorsInterface():
                                                              check_write_freq=True,
                                                              max_read_attempts=1000)
                 self._debug_print(response)
-                if response:
+                if response and not response.strip() == b'':
                     return response.strip()
                 else:
                     self._debug_print('no response')

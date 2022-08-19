@@ -1,6 +1,12 @@
 shell:
 	guix time-machine -C .channels.scm -- shell --pure -D -f .guix.scm
 
+ipython:
+	guix time-machine -C .channels.scm -- shell --pure -D -f .guix.scm -- ipython
+
+picocom:
+	guix shell picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c /dev/ttyUSB0
+
 all: files package upload add clean
 
 edits:

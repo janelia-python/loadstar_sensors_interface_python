@@ -6,7 +6,7 @@
 
 ```markdown
 - Name: loadstar_sensors_interface
-- Version: 0.2.0
+- Version: 0.3.0
 - Description: Python interface to Loadstar Sensors USB devices.
 - License: BSD 3-Clause License
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -32,10 +32,16 @@ dev.tare()
 sensor_value = dev.get_sensor_value()
 
 model = dev.get_model()
-id = dev.get_id()
+device_id = dev.get_device_id()
 units = dev.get_units()
 load_capactiy = dev.get_load_capacity()
-gain = dev.get_gain()
+dev.set_averaging_window(10) # 1-1024 samples
+dev.set_averaging_threshold(10) # 1-100 percent
+
+dev.set_scale_factor(453.59) # e.g. lb to gram
+scale_factor = dev.get_scale_factor()
+
+settings = dev.get_settings()
 
 ```
 
@@ -91,13 +97,4 @@ Download and install Windows driver:
 python3 -m venv C:\venvs\loadstar_sensors_interface
 C:\venvs\loadstar_sensors_interface\Scripts\activate
 pip install loadstar_sensors_interface
-```
-
-
-# Test
-
-```sh
-guix shell picocom
-picocom -b 9600 -f n -y n -d 8 -p 1 -c /dev/ttyUSB0
-?
 ```
