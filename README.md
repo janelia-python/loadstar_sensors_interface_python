@@ -6,7 +6,7 @@
 
 ```markdown
 - Name: loadstar_sensors_interface
-- Version: 0.4.0
+- Version: 0.5.0
 - Description: Python interface to Loadstar Sensors USB devices.
 - License: BSD 3-Clause License
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -16,6 +16,8 @@
 - Reference: https://www.loadstarsensors.com/
 - Dependencies:
   - serial_interface
+  - click
+  - plotext
 ```
 
 
@@ -56,8 +58,25 @@ settings = dev.get_settings()
 
 ### udev rules
 
+[99-platformio-udev.rules](https://docs.platformio.org/en/stable/core/installation/udev-rules.html)
+
 ```sh
-sudo cp 77-loadstar-sensors.rules /etc/udev/rules.d/
+# Recommended
+curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules
+
+# OR, manually download and copy this file to destination folder
+sudo cp 99-platformio-udev.rules /etc/udev/rules.d/99-platformio-udev.rules
+
+# Restart udev management tool
+sudo service udev restart
+
+# or
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+# Ubuntu/Debian users may need to add own “username” to the “dialout” group
+sudo usermod -a -G dialout $USER
+sudo usermod -a -G plugdev $USER
 ```
 
 

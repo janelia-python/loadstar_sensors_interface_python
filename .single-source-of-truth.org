@@ -8,7 +8,7 @@ loadstar_sensors_interface
 
 #+NAME: version
 #+BEGIN_SRC text :exports none :noweb yes
-0.4.0
+0.5.0
 #+END_SRC
 
 #+NAME: repository-name
@@ -29,6 +29,11 @@ Python interface to Loadstar Sensors USB devices.
 #+NAME: license
 #+BEGIN_SRC text :exports none :noweb yes
 BSD 3-Clause License
+#+END_SRC
+
+#+NAME: license-files
+#+BEGIN_SRC text :exports none :noweb yes
+LICENSE
 #+END_SRC
 
 #+NAME: url
@@ -54,6 +59,8 @@ peter@polidoro.io
 #+NAME: dependencies
 #+BEGIN_SRC text :exports none :noweb yes
 serial_interface
+click
+plotext
 #+END_SRC
 
 #+NAME: reference
@@ -116,8 +123,25 @@ settings = dev.get_settings()
 
 *** udev rules
 
+[[https://docs.platformio.org/en/stable/core/installation/udev-rules.html][99-platformio-udev.rules]]
+
 #+BEGIN_SRC sh :noweb yes
-sudo cp 77-loadstar-sensors.rules /etc/udev/rules.d/
+# Recommended
+curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules
+
+# OR, manually download and copy this file to destination folder
+sudo cp 99-platformio-udev.rules /etc/udev/rules.d/99-platformio-udev.rules
+
+# Restart udev management tool
+sudo service udev restart
+
+# or
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+# Ubuntu/Debian users may need to add own “username” to the “dialout” group
+sudo usermod -a -G dialout $USER
+sudo usermod -a -G plugdev $USER
 #+END_SRC
 
 *** pip
@@ -179,6 +203,8 @@ settings
 ** Guix
 
 #+BEGIN_SRC markdown :tangle DEVELOPMENT.md :noweb yes
+[Install Guix](https://guix.gnu.org/manual/en/html_node/Binary-Installation.html)
+
 ```shell
 git clone <<url>>
 cd <<repository-name>>
@@ -191,43 +217,11 @@ exit
 
 * Tangled Files                                                    :noexport:
 
-#+BEGIN_SRC text :tangle MANIFEST.in :exports none :noweb yes
-# MANIFEST.in is generated automatically from .single-source-of-truth.org
-# File edits may be overwritten!
-include 77-loadstar-sensors.rules
-include README.md
-include LICENSE
-#+END_SRC
-
-#+BEGIN_SRC text :tangle 77-loadstar-sensors.rules :exports none :noweb yes
-# 77-loadstar-sensors.rules is generated automatically from .single-source-of-truth.org
-# File edits may be overwritten!
-# UDEV Rules for <<reference>> devices.
-#
-# The latest version of this file may be found at:
-#   <<url>>
-#
-# This file must be placed at:
-#
-# /etc/udev/rules.d/77-loadstar-sensors.rules
-#
-# To install, type this command in a terminal:
-#   sudo cp 77-loadstar-sensors.rules /etc/udev/rules.d/
-#
-# After this file is installed, physically unplug and reconnect device.
-#
-# Original FT232/FT245 VID:PID
-ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", MODE="0666", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_PORT_IGNORE}="1"
-#+END_SRC
-
 #+BEGIN_SRC text :tangle pyproject.toml :exports none :noweb yes
 # pyproject.toml is generated automatically from .single-source-of-truth.org
 # File edits may be overwritten!
 [build-system]
-requires = [
-    "setuptools",
-    "wheel"
-]
+requires = ["setuptools"]
 build-backed = "setuptools.build_meta"
 #+END_SRC
 
@@ -244,6 +238,7 @@ description = <<description>>
 long_description = file: README.md
 long_description_content_type = text/markdown
 license = <<license>>
+license_files = <<license-files>>
 classifiers =
     Programming Language :: Python :: 3
 
@@ -257,11 +252,9 @@ install_requires =
 [options.packages.find]
 where=src
 
-[bdist_wheel]
-# This flag says that the code is written to work on both Python 2 and Python
-# 3. If at all possible, it is good practice to do this. If you cannot, you
-# will need to generate wheels for each Python version that you support.
-universal=1
+[options.entry_points]
+console_scripts =
+    loadstar = <<name>>.cli:main
 #+END_SRC
 
 #+BEGIN_SRC python :tangle setup.py :exports none :noweb yes
@@ -304,4 +297,12 @@ from loadstar_sensors_interface.__about__ import (
 )
 
 from .loadstar_sensors_interface import LoadstarSensorsInterface
+#+END_SRC
+
+#+BEGIN_SRC python :tangle src/loadstar_sensors_interface/__main__.py :exports none :noweb yes
+# __init__.py is generated automatically from .single-source-of-truth.org
+# File edits may be overwritten!
+# To be able to run as "python -m loadstar_sensors_interface"
+from .cli import main
+main()
 #+END_SRC

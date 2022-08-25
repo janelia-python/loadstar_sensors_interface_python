@@ -1,6 +1,6 @@
 # __about__.py is generated automatically from .single-source-of-truth.org
 # File edits may be overwritten!
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 __description__ = 'Python interface to Loadstar Sensors USB devices.'
 __license__ = 'BSD 3-Clause License'
 __url__ = 'https://github.com/janelia-pypi/loadstar_sensors_interface_python'

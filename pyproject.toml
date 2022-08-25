@@ -1,8 +1,5 @@
 # pyproject.toml is generated automatically from .single-source-of-truth.org
 # File edits may be overwritten!
 [build-system]
-requires = [
-    "setuptools",
-    "wheel"
-]
+requires = ["setuptools"]
 build-backed = "setuptools.build_meta"

@@ -1,5 +1,0 @@
-# MANIFEST.in is generated automatically from .single-source-of-truth.org
-# File edits may be overwritten!
-include 77-loadstar-sensors.rules
-include README.md
-include LICENSE

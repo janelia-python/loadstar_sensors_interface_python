@@ -10,7 +10,8 @@
  (gnu packages python-build)
  (gnu packages python-xyz)
  (gnu packages version-control)
- (guix-janelia packages python-janelia))
+ (guix-janelia packages python-janelia)
+ (guix-janelia packages python-xyz))
 
 (define %source-dir (dirname (current-filename)))
 
@@ -30,7 +31,9 @@
                          python-wheel
                          python-twine
                          python-ipython))
-    (propagated-inputs (list python-serial-interface))
+    (propagated-inputs (list python-serial-interface
+                             python-click
+                             python-plotext))
     (home-page "")
     (synopsis "")
     (description "")
