@@ -243,14 +243,9 @@ classifiers =
     Programming Language :: Python :: 3
 
 [options]
-package_dir=
-    =src
 packages = find:
 install_requires =
     <<dependencies>>
-
-[options.packages.find]
-where=src
 
 [options.entry_points]
 console_scripts =
@@ -267,7 +262,7 @@ if __name__ == '__main__':
     setup()
 #+END_SRC
 
-#+BEGIN_SRC python :tangle src/loadstar_sensors_interface/__about__.py :exports none :noweb yes
+#+BEGIN_SRC python :tangle loadstar_sensors_interface/__about__.py :exports none :noweb yes
 # __about__.py is generated automatically from .single-source-of-truth.org
 # File edits may be overwritten!
 __version__ = '<<version>>'
@@ -279,7 +274,7 @@ __email__ = '<<email>>'
 __copyright__ = '<<copyright>>'
 #+END_SRC
 
-#+BEGIN_SRC python :tangle src/loadstar_sensors_interface/__init__.py :exports none :noweb yes
+#+BEGIN_SRC python :tangle loadstar_sensors_interface/__init__.py :exports none :noweb yes
 '''
 <<description>>
 '''
@@ -299,7 +294,7 @@ from loadstar_sensors_interface.__about__ import (
 from .loadstar_sensors_interface import LoadstarSensorsInterface
 #+END_SRC
 
-#+BEGIN_SRC python :tangle src/loadstar_sensors_interface/__main__.py :exports none :noweb yes
+#+BEGIN_SRC python :tangle loadstar_sensors_interface/__main__.py :exports none :noweb yes
 # __init__.py is generated automatically from .single-source-of-truth.org
 # File edits may be overwritten!
 # To be able to run as "python -m loadstar_sensors_interface"
