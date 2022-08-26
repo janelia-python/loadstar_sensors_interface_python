@@ -197,7 +197,7 @@ pip install <<name>>
 
 * Development
 
-[[./DEVELOPMENT.md]]
+[[./DEVELOPMENT.md][DEVELOPMENT.md]]
 
 * Development.md                                                   :noexport:
 

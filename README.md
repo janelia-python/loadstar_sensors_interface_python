@@ -121,4 +121,4 @@ pip install loadstar_sensors_interface
 
 # Development
 
-<./DEVELOPMENT.md>
+[DEVELOPMENT.md](./DEVELOPMENT.md)
