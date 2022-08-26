@@ -1,9 +1,18 @@
 import time
 import serial
+from enum import Enum
+
 from serial_interface import SerialInterface, ReadError
 
 
 DEBUG = False
+
+class ScaleFactor(Enum):
+    ONE = 1.0
+    LB_TO_GM = 453.59237
+    LB_TO_KG = 0.45359237
+    LB_TO_N = 4.44822
+    LB_TO_OZ = 16
 
 class LoadstarSensorsInterface():
     '''
@@ -48,6 +57,22 @@ class LoadstarSensorsInterface():
         self._scale_factor = 1.0
         self._serial_interface = SerialInterface(*args,**kwargs)
 
+    def print_device_info(self):
+        device_port = self.get_device_port()
+        print(f'device_port: {device_port}')
+
+        device_model = self.get_device_model()
+        print(f'device_model: {device_model}')
+
+        device_id = self.get_device_id()
+        print(f'device_id: {device_id}')
+
+        native_units = self.get_native_units()
+        print(f'native_units: {native_units}')
+
+        scale_factor = self.get_scale_factor()
+        print(f'scale_factor: {scale_factor}')
+
     def tare(self):
         for x in range(self._READ_ATTEMPTS):
             response = self._send_request_get_response('tare')
@@ -69,6 +94,9 @@ class LoadstarSensorsInterface():
                 self._sleep()
         return None
 
+    def get_device_port(self):
+        return self._serial_interface.port
+
     def get_device_model(self):
         response = self._send_request_get_response('model')
         return response.decode()
@@ -77,9 +105,21 @@ class LoadstarSensorsInterface():
         response = self._send_request_get_response('id')
         return response.decode()
 
-    def get_units(self):
+    def get_native_units(self):
         response = self._send_request_get_response('unit')
         return response.decode()
+
+    def get_scale_factor(self):
+        return self._scale_factor
+
+    def set_scale_factor(self, scale_factor):
+        if type(scale_factor) == type(ScaleFactor.ONE):
+            self._scale_factor = scale_factor.value
+            return
+        try:
+            self._scale_factor = ScaleFactor[scale_factor].value
+        except KeyError:
+            self._scale_factor = float(scale_factor)
 
     def get_load_capacity(self):
         response = self._send_request_get_response('lc')
@@ -100,12 +140,6 @@ class LoadstarSensorsInterface():
             averaging_threshold = self._AVERAGING_THRESHOLD_MAX
         averaging_threshold = averaging_threshold/self._AVERAGING_THRESHOLD_MAX
         response = self._send_request_get_response('CLA ' + str(averaging_threshold))
-
-    def get_scale_factor(self):
-        return self._scale_factor
-
-    def set_scale_factor(self, scale_factor):
-        self._scale_factor = float(scale_factor)
 
     def get_settings(self):
         response = self._send_request_get_response('settings')

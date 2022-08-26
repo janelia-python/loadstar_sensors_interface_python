@@ -27,33 +27,41 @@
 ## Python
 
 ```python
-from loadstar_sensors_interface import LoadstarSensorsInterface
+from loadstar_sensors_interface import LoadstarSensorsInterface, ScaleFactor
 dev = LoadstarSensorsInterface() # Try to automatically detect port
 dev = LoadstarSensorsInterface(port='/dev/ttyUSB0') # Linux specific port
 dev = LoadstarSensorsInterface(port='/dev/tty.usbmodem262471') # Mac OS X specific port
 dev = LoadstarSensorsInterface(port='COM3') # Windows specific port
 
+dev.print_device_info()
 dev.tare()
-sensor_value = dev.get_sensor_value()
+dev.get_sensor_value()
 
-device_model = dev.get_device_model()
-device_id = dev.get_device_id()
-units = dev.get_units()
-load_capactiy = dev.get_load_capacity()
+dev.get_device_port()
+dev.get_device_model()
+dev.get_device_id()
+dev.get_native_units()
+dev.get_load_capacity()
 dev.set_averaging_window(10) # 1-1024 samples
 dev.set_averaging_threshold(10) # 1-100 percent
 
-dev.set_scale_factor(453.59) # e.g. lb to gram
-scale_factor = dev.get_scale_factor()
+dev.set_scale_factor(ScaleFactor.LB_TO_GM)
+dev.get_scale_factor()
 
-settings = dev.get_settings()
+dev.set_scale_factor('ONE') # ScaleFactor string
+dev.get_scale_factor()
+
+dev.set_scale_factor(25.4) # float e.g. in to mm
+dev.get_scale_factor()
+
+dev.get_settings()
 ```
 
 
 ## Command Line
 
 ```sh
-loadstar --port /dev/ttyUSB0 --tare
+loadstar --port /dev/ttyUSB0 --tare --scale-factor LB_TO_GM
 ```
 
 
