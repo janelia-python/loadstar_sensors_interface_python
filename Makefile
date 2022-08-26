@@ -8,7 +8,7 @@ serial-shell:
 	guix shell picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c /dev/ttyUSB0
 
 installed-shell:
-	guix time-machine -C .channels.scm -- shell --pure -f .guix.scm
+	guix time-machine -C .channels.scm -- shell --pure -f .guix.scm --rebuild-cache
 
 upload: files package twine add clean
 

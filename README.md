@@ -23,6 +23,9 @@
 
 # Example Usage
 
+
+## Python
+
 ```python
 from loadstar_sensors_interface import LoadstarSensorsInterface
 dev = LoadstarSensorsInterface() # Try to automatically detect port
@@ -33,7 +36,7 @@ dev = LoadstarSensorsInterface(port='COM3') # Windows specific port
 dev.tare()
 sensor_value = dev.get_sensor_value()
 
-model = dev.get_model()
+device_model = dev.get_device_model()
 device_id = dev.get_device_id()
 units = dev.get_units()
 load_capactiy = dev.get_load_capacity()
@@ -44,7 +47,13 @@ dev.set_scale_factor(453.59) # e.g. lb to gram
 scale_factor = dev.get_scale_factor()
 
 settings = dev.get_settings()
+```
 
+
+## Command Line
+
+```sh
+loadstar --port /dev/ttyUSB0 --tare
 ```
 
 

@@ -69,17 +69,17 @@ class LoadstarSensorsInterface():
                 self._sleep()
         return None
 
-    def get_model(self):
+    def get_device_model(self):
         response = self._send_request_get_response('model')
-        return response
+        return response.decode()
 
     def get_device_id(self):
         response = self._send_request_get_response('id')
-        return response
+        return response.decode()
 
     def get_units(self):
         response = self._send_request_get_response('unit')
-        return response
+        return response.decode()
 
     def get_load_capacity(self):
         response = self._send_request_get_response('lc')

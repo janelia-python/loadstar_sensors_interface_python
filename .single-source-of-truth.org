@@ -108,6 +108,8 @@ File edits may be overwritten! -->
 
 * Example Usage
 
+** Python
+
 #+BEGIN_SRC python
 from loadstar_sensors_interface import LoadstarSensorsInterface
 dev = LoadstarSensorsInterface() # Try to automatically detect port
@@ -118,7 +120,7 @@ dev = LoadstarSensorsInterface(port='COM3') # Windows specific port
 dev.tare()
 sensor_value = dev.get_sensor_value()
 
-model = dev.get_model()
+device_model = dev.get_device_model()
 device_id = dev.get_device_id()
 units = dev.get_units()
 load_capactiy = dev.get_load_capacity()
@@ -129,7 +131,12 @@ dev.set_scale_factor(453.59) # e.g. lb to gram
 scale_factor = dev.get_scale_factor()
 
 settings = dev.get_settings()
+#+END_SRC
 
+** Command Line
+
+#+BEGIN_SRC sh
+loadstar --port /dev/ttyUSB0 --tare
 #+END_SRC
 
 * Installation
@@ -385,12 +392,4 @@ from loadstar_sensors_interface.__about__ import (
     __version__)
 
 from .loadstar_sensors_interface import LoadstarSensorsInterface
-#+END_SRC
-
-#+BEGIN_SRC python :tangle loadstar_sensors_interface/__main__.py :exports none :noweb yes
-# __init__.py is generated automatically from .single-source-of-truth.org
-# File edits may be overwritten!
-# To be able to run as "python -m loadstar_sensors_interface"
-from .cli import main
-main()
 #+END_SRC
