@@ -6,7 +6,7 @@
 
 ```markdown
 - Name: loadstar_sensors_interface
-- Version: 0.6.0
+- Version: 0.7.0
 - Description: Python interface to Loadstar Sensors USB devices.
 - License: BSD 3-Clause License
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -117,3 +117,8 @@ python3 -m venv C:\venvs\loadstar_sensors_interface
 C:\venvs\loadstar_sensors_interface\Scripts\activate
 pip install loadstar_sensors_interface
 ```
+
+
+# Development
+
+<./DEVELOPMENT.md>

@@ -1,3 +1,6 @@
+;; .guix.scm is generated automatically from .single-source-of-truth.org
+;; File edits may be overwritten!
+
 (use-modules
  (guix packages)
  (guix git-download)
@@ -31,12 +34,13 @@
                          python-wheel
                          python-twine
                          python-ipython))
-    (propagated-inputs (list python-serial-interface
-                             python-click
-                             python-plotext))
+    (propagated-inputs (list
+                        python-serial-interface
+                        python-click
+                        python-plotext))
     (home-page "")
     (synopsis "")
     (description "")
-    (license license:gpl3+)))
+    (license license:bsd-3)))
 
 python-dev-package

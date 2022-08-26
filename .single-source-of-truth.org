@@ -8,7 +8,7 @@ loadstar_sensors_interface
 
 #+NAME: version
 #+BEGIN_SRC text :exports none :noweb yes
-0.6.0
+0.7.0
 #+END_SRC
 
 #+NAME: repository-name
@@ -29,6 +29,11 @@ Python interface to Loadstar Sensors USB devices.
 #+NAME: license
 #+BEGIN_SRC text :exports none :noweb yes
 BSD 3-Clause License
+#+END_SRC
+
+#+NAME: guix-license
+#+BEGIN_SRC text :exports none :noweb yes
+license:bsd-3
 #+END_SRC
 
 #+NAME: license-files
@@ -56,16 +61,28 @@ peter@polidoro.io
 2022 Howard Hughes Medical Institute
 #+END_SRC
 
-#+NAME: dependencies
+#+NAME: python-dependencies
 #+BEGIN_SRC text :exports none :noweb yes
 serial_interface
 click
 plotext
 #+END_SRC
 
+#+NAME: guix-dependencies
+#+BEGIN_SRC text :exports none :noweb yes
+python-serial-interface
+python-click
+python-plotext
+#+END_SRC
+
 #+NAME: reference
 #+BEGIN_SRC text :exports none :noweb yes
 https://www.loadstarsensors.com/
+#+END_SRC
+
+#+NAME: command-line-interface
+#+BEGIN_SRC text :exports none :noweb yes
+loadstar
 #+END_SRC
 
 #+BEGIN_EXAMPLE
@@ -86,7 +103,7 @@ File edits may be overwritten! -->
 - Copyright: <<copyright>>
 - Reference: <<reference>>
 - Dependencies:
-  - <<dependencies>>
+  - <<python-dependencies>>
 #+END_SRC
 
 * Example Usage
@@ -178,44 +195,121 @@ C:\venvs\<<name>>\Scripts\activate
 pip install <<name>>
 #+END_SRC
 
-* Test :noexport:
+* Development
 
-** Use guix shell to test python library
+[[./DEVELOPMENT.md]]
 
-#+BEGIN_SRC sh :noweb yes
-make ipython
-from loadstar_sensors_interface import LoadstarSensorsInterface
-dev = LoadstarSensorsInterface()
-exit
-#+END_SRC
-
-** Interact with directly with device using serial terminal
-
-#+BEGIN_SRC sh :noweb yes
-make picocom
-? # help
-settings
-[C-a][C-x] # to exit
-#+END_SRC
-
-* Development :noexport:
-
-** Guix
+* Development.md                                                   :noexport:
 
 #+BEGIN_SRC markdown :tangle DEVELOPMENT.md :noweb yes
+# Install Guix
 [Install Guix](https://guix.gnu.org/manual/en/html_node/Binary-Installation.html)
+
+# Clone Repository
 
 ```shell
 git clone <<url>>
 cd <<repository-name>>
-make shell
+```
+
+# Edit .single-source-of-truth
+
+```shell
+make dev-shell
 make edits
-make all
+make files
 exit
+```
+
+# Test Python package using ipython shell
+
+```shell
+make ipython-shell
+import <<name>>
+exit
+```
+
+# Test installation of Guix package
+
+```shell
+make installed-shell
+exit
+```
+
+# Test command line interface
+
+```shell
+make installed-shell
+<<command-line-interface>>
+exit
+```
+
+# Upload Python package to pypi
+
+```shell
+make dev-shell
+make upload
+exit
+```
+
+# Test direct device interaction using serial terminal
+
+```shell
+make serial-shell
+? # help
+settings
+[C-a][C-x] # to exit
 ```
 #+END_SRC
 
 * Tangled Files                                                    :noexport:
+
+#+BEGIN_SRC scheme :tangle .guix.scm :exports none :noweb yes
+;; .guix.scm is generated automatically from .single-source-of-truth.org
+;; File edits may be overwritten!
+
+(use-modules
+ (guix packages)
+ (guix git-download)
+ (guix gexp)
+ ((guix licenses) #:prefix license:)
+ (guix build-system python)
+ (gnu packages base)
+ (gnu packages emacs)
+ (gnu packages emacs-xyz)
+ (gnu packages python-build)
+ (gnu packages python-xyz)
+ (gnu packages version-control)
+ (guix-janelia packages python-janelia)
+ (guix-janelia packages python-xyz))
+
+(define %source-dir (dirname (current-filename)))
+
+(define-public python-dev-package
+  (package
+    (name "python-dev-package")
+    (version "dev")
+    (source (local-file %source-dir
+                        #:recursive? #t
+                        #:select? (git-predicate %source-dir)))
+    (build-system python-build-system)
+    (native-inputs (list gnu-make
+                         git
+                         emacs
+                         emacs-org
+                         emacs-ox-gfm
+                         python-wheel
+                         python-twine
+                         python-ipython))
+    (propagated-inputs (list
+                        <<guix-dependencies>>))
+    (home-page "")
+    (synopsis "")
+    (description "")
+    (license <<guix-license>>)))
+
+python-dev-package
+#+END_SRC
 
 #+BEGIN_SRC text :tangle pyproject.toml :exports none :noweb yes
 # pyproject.toml is generated automatically from .single-source-of-truth.org
@@ -245,11 +339,11 @@ classifiers =
 [options]
 packages = find:
 install_requires =
-    <<dependencies>>
+    <<python-dependencies>>
 
 [options.entry_points]
 console_scripts =
-    loadstar = <<name>>.cli:main
+    <<command-line-interface>> = <<name>>.cli:main
 #+END_SRC
 
 #+BEGIN_SRC python :tangle setup.py :exports none :noweb yes
@@ -288,8 +382,7 @@ from loadstar_sensors_interface.__about__ import (
     __license__,
     __description__,
     __url__,
-    __version__,
-)
+    __version__)
 
 from .loadstar_sensors_interface import LoadstarSensorsInterface
 #+END_SRC

@@ -11,7 +11,6 @@ from loadstar_sensors_interface.__about__ import (
     __license__,
     __description__,
     __url__,
-    __version__,
-)
+    __version__)
 
 from .loadstar_sensors_interface import LoadstarSensorsInterface
