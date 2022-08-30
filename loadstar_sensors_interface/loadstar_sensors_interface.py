@@ -15,13 +15,11 @@ class ScaleFactor(Enum):
     LB_TO_OZ = 16
 
 class LoadstarSensorsInterface():
-    '''
-    Python interface to Loadstar Sensors USB devices.
-    '''
+    '''Python interface to Loadstar Sensors USB devices.'''
     _TIMEOUT = 0.05
     _WRITE_TIMEOUT = 0.05
-    _WRITE_READ_DELAY = 0.010
-    _WRITE_WRITE_DELAY = 0.010
+    _WRITE_READ_DELAY = 0.001
+    _WRITE_WRITE_DELAY = 0.005
     _REQUEST_EOL = '\r'
     _RESPONSE_EOL = b'\r\n'
     _READ_ATTEMPTS = 100
@@ -31,6 +29,7 @@ class LoadstarSensorsInterface():
     _AVERAGING_WINDOW_MAX = 1024
     _AVERAGING_THRESHOLD_MIN = 1
     _AVERAGING_THRESHOLD_MAX = 100
+    _AVERAGING_THRESHOLD_SCALING = 4545.4556
 
     def __init__(self,*args,**kwargs):
         if 'debug' in kwargs:
@@ -55,25 +54,34 @@ class LoadstarSensorsInterface():
                        'dsrdtr': False
                        })
         self._scale_factor = 1.0
+        self._scale_factor_name = 'ONE'
         self._serial_interface = SerialInterface(*args,**kwargs)
 
-    def print_device_info(self):
-        device_port = self.get_device_port()
-        print(f'device_port: {device_port}')
+    def get_device_info(self):
+        '''Query device and return information.'''
+        device_info = {}
+        device_info['port'] = self.get_port()
+        device_info['model'] = self.get_model()
+        device_info['id'] = self.get_id()
+        device_info['native_units'] = self.get_native_units()
+        device_info['scale_factor'] = self.get_scale_factor()
+        device_info['scale_factor_name'] = self.get_scale_factor_name()
+        device_info['load_capacity'] = self.get_load_capacity()
+        device_info['averaging_window'] = self.get_averaging_window()
+        device_info['averaging_threshold'] = self.get_averaging_threshold()
+        return device_info
 
-        device_model = self.get_device_model()
-        print(f'device_model: {device_model}')
-
-        device_id = self.get_device_id()
-        print(f'device_id: {device_id}')
-
-        native_units = self.get_native_units()
-        print(f'native_units: {native_units}')
-
-        scale_factor = self.get_scale_factor()
-        print(f'scale_factor: {scale_factor}')
+    def print_device_info(self,additional_device_info={}):
+        '''Query device and print information.'''
+        device_info = self.get_device_info()
+        device_info.update(additional_device_info)
+        print('device info:')
+        for key,value in device_info.items():
+            print(f'{key:<25}{value}')
+        print('')
 
     def tare(self):
+        '''Reset sensor values so current value is zero.'''
         for x in range(self._READ_ATTEMPTS):
             response = self._send_request_get_response('tare')
             if response == self._GOOD_RESPONSE:
@@ -84,6 +92,7 @@ class LoadstarSensorsInterface():
         return False
 
     def get_sensor_value(self):
+        '''Return sensor value after multiplying by scale factor.'''
         for x in range(self._READ_ATTEMPTS):
             try:
                 response = self._send_request_get_response('w')
@@ -94,54 +103,99 @@ class LoadstarSensorsInterface():
                 self._sleep()
         return None
 
-    def get_device_port(self):
+    def get_port(self):
+        '''Return sensor device name (e.g. /dev/ttyUSB0 on GNU/Linux or COM3 on
+        Windows).'''
         return self._serial_interface.port
 
-    def get_device_model(self):
+    def get_model(self):
+        '''Return sensor device model.'''
         response = self._send_request_get_response('model')
-        return response.decode()
+        response = response.decode()
+        return response
 
-    def get_device_id(self):
+    def get_id(self):
+        '''Return sensor device id.'''
         response = self._send_request_get_response('id')
-        return response.decode()
+        response = response.decode()
+        return response
 
     def get_native_units(self):
+        '''Return the units of the sensor value before it is multiplied by the
+        scale factor.'''
         response = self._send_request_get_response('unit')
-        return response.decode()
+        response = response.decode()
+        return response
 
     def get_scale_factor(self):
+        '''Return the floating point number that gets multiplied to the sensor
+        value before it is returned.'''
         return self._scale_factor
 
+    def get_scale_factor_name(self):
+        '''Return the name of the scale factor, if any.'''
+        return self._scale_factor_name
+
     def set_scale_factor(self, scale_factor):
+        '''Set the floating point number that gets multiplied to the sensor
+        value before it is returned. (e.g. to convert native units into
+        different output units)'''
         if type(scale_factor) == type(ScaleFactor.ONE):
             self._scale_factor = scale_factor.value
+            self._scale_factor_name = scale_factor.name
             return
         try:
             self._scale_factor = ScaleFactor[scale_factor].value
+            self._scale_factor_name = ScaleFactor[scale_factor].name
         except KeyError:
             self._scale_factor = float(scale_factor)
+            self._scale_factor_name = None
 
     def get_load_capacity(self):
+        '''Return the maximum sensor value in its native units multiplied by the
+        scale factor. (e.g. to convert native units into different output
+        units)'''
         response = self._send_request_get_response('lc')
         load_capacity = float(response) * self._scale_factor
         return load_capacity
 
+    def get_averaging_window(self):
+        '''Return the number of points to average. (1-1024 samples)'''
+        response = self._send_request_get_response('css')
+        averaging_window = int(response)
+        return averaging_window
+
     def set_averaging_window(self, averaging_window):
+        '''Set the number of points to average. (1-1024 samples)'''
+        averaging_window = int(averaging_window)
         if averaging_window < self._AVERAGING_WINDOW_MIN:
             averaging_window = self._AVERAGING_WINDOW_MIN
         if averaging_window > self._AVERAGING_WINDOW_MAX:
             averaging_window = self._AVERAGING_WINDOW_MAX
-        response = self._send_request_get_response('CSS ' + str(averaging_window))
+        response = self._send_request_get_response('css ' + str(averaging_window))
+
+    def get_averaging_threshold(self):
+        '''Return the percentage of capacity below which average is performed.
+        (1-100%)'''
+        response = self._send_request_get_response('cla')
+        # e.g. b'00000\t( 2.1999995e-01)'
+        averaging_threshold = float(response.decode().split('(')[1].split(')')[0])
+        averaging_threshold *= self._AVERAGING_THRESHOLD_SCALING
+        averaging_threshold = int(averaging_threshold)
+        return averaging_threshold
 
     def set_averaging_threshold(self, averaging_threshold):
+        '''Set the percentage of capacity below which average is performed.
+        (1-100%)'''
+        averaging_threshold = int(averaging_threshold)
         if averaging_threshold < self._AVERAGING_THRESHOLD_MIN:
             averaging_threshold = self._AVERAGING_THRESHOLD_MIN
         if averaging_threshold > self._AVERAGING_THRESHOLD_MAX:
             averaging_threshold = self._AVERAGING_THRESHOLD_MAX
         averaging_threshold = averaging_threshold/self._AVERAGING_THRESHOLD_MAX
-        response = self._send_request_get_response('CLA ' + str(averaging_threshold))
+        response = self._send_request_get_response('cla ' + str(averaging_threshold))
 
-    def get_settings(self):
+    def _get_device_settings(self):
         response = self._send_request_get_response('settings')
         settings = []
         for x in range(self._READ_ATTEMPTS):
@@ -149,7 +203,7 @@ class LoadstarSensorsInterface():
             if response == b'' or response == self._GOOD_RESPONSE:
                 break
             else:
-                settings.append(response.strip())
+                settings.append(response.strip().decode())
         return settings
 
     def _send_request_get_response(self,request,use_readline=True):

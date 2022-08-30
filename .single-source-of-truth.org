@@ -8,7 +8,7 @@ loadstar_sensors_interface
 
 #+NAME: version
 #+BEGIN_SRC text :exports none :noweb yes
-0.7.0
+0.8.0
 #+END_SRC
 
 #+NAME: repository-name
@@ -117,34 +117,48 @@ dev = LoadstarSensorsInterface(port='/dev/ttyUSB0') # Linux specific port
 dev = LoadstarSensorsInterface(port='/dev/tty.usbmodem262471') # Mac OS X specific port
 dev = LoadstarSensorsInterface(port='COM3') # Windows specific port
 
-dev.print_device_info()
+dev.get_device_info()
 dev.tare()
 dev.get_sensor_value()
 
-dev.get_device_port()
-dev.get_device_model()
-dev.get_device_id()
+dev.get_port()
+dev.get_model()
+dev.get_id()
 dev.get_native_units()
 dev.get_load_capacity()
-dev.set_averaging_window(10) # 1-1024 samples
-dev.set_averaging_threshold(10) # 1-100 percent
+dev.set_averaging_window(5) # 1-1024 samples
+dev.get_averaging_window()
+dev.set_averaging_threshold(25) # 1-100 percent
+dev.get_averaging_threshold()
 
 dev.set_scale_factor(ScaleFactor.LB_TO_GM)
 dev.get_scale_factor()
 
-dev.set_scale_factor('ONE') # ScaleFactor string
+dev.set_scale_factor('LB_TO_GM') # ScaleFactor string
 dev.get_scale_factor()
 
 dev.set_scale_factor(25.4) # float e.g. in to mm
 dev.get_scale_factor()
-
-dev.get_settings()
 #+END_SRC
 
 ** Command Line
 
 #+BEGIN_SRC sh
-loadstar --port /dev/ttyUSB0 --tare --scale-factor LB_TO_GM
+loadstar --help
+# Usage: loadstar [OPTIONS]
+
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC sh
+loadstar --info
+
+#+END_SRC
+
+#+BEGIN_SRC sh
+loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 5 -t 25 -f 1 -d 10
+
 #+END_SRC
 
 * Installation
@@ -251,14 +265,6 @@ make installed-shell
 exit
 ```
 
-# Test command line interface
-
-```shell
-make installed-shell
-<<command-line-interface>>
-exit
-```
-
 # Upload Python package to pypi
 
 ```shell
@@ -295,6 +301,7 @@ settings
  (gnu packages python-build)
  (gnu packages python-xyz)
  (gnu packages version-control)
+ (gnu packages ncurses)
  (guix-janelia packages python-janelia)
  (guix-janelia packages python-xyz))
 
@@ -317,6 +324,7 @@ settings
                          python-twine
                          python-ipython))
     (propagated-inputs (list
+                        ncurses
                         <<guix-dependencies>>))
     (home-page "")
     (synopsis "")

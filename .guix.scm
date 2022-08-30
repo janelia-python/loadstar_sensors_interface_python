@@ -13,6 +13,7 @@
  (gnu packages python-build)
  (gnu packages python-xyz)
  (gnu packages version-control)
+ (gnu packages ncurses)
  (guix-janelia packages python-janelia)
  (guix-janelia packages python-xyz))
 
@@ -35,6 +36,7 @@
                          python-twine
                          python-ipython))
     (propagated-inputs (list
+                        ncurses
                         python-serial-interface
                         python-click
                         python-plotext))

@@ -32,14 +32,6 @@ make installed-shell
 exit
 ```
 
-# Test command line interface
-
-```shell
-make installed-shell
-loadstar
-exit
-```
-
 # Upload Python package to pypi
 
 ```shell
