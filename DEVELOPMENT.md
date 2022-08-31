@@ -1,3 +1,7 @@
+<!---
+This file is generated automatically from .single-source-of-truth.org
+File edits may be overwritten!
+--->
 # Install Guix
 [Install Guix](https://guix.gnu.org/manual/en/html_node/Binary-Installation.html)
 

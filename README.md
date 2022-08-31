@@ -1,12 +1,14 @@
-<!-- README.md is generated automatically from .single-source-of-truth.org
-    File edits may be overwritten! -->
+<!---
+    This file is generated automatically from .single-source-of-truth.org
+    File edits may be overwritten!
+    --->
 
 
 # About
 
 ```markdown
 - Name: loadstar_sensors_interface
-- Version: 0.7.0
+- Version: 0.8.0
 - Description: Python interface to Loadstar Sensors USB devices.
 - License: BSD 3-Clause License
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -33,35 +35,47 @@ dev = LoadstarSensorsInterface(port='/dev/ttyUSB0') # Linux specific port
 dev = LoadstarSensorsInterface(port='/dev/tty.usbmodem262471') # Mac OS X specific port
 dev = LoadstarSensorsInterface(port='COM3') # Windows specific port
 
-dev.print_device_info()
+dev.get_device_info()
 dev.tare()
 dev.get_sensor_value()
 
-dev.get_device_port()
-dev.get_device_model()
-dev.get_device_id()
+dev.get_port()
+dev.get_model()
+dev.get_id()
 dev.get_native_units()
 dev.get_load_capacity()
-dev.set_averaging_window(10) # 1-1024 samples
-dev.set_averaging_threshold(10) # 1-100 percent
+dev.set_averaging_window(5) # 1-1024 samples
+dev.get_averaging_window()
+dev.set_averaging_threshold(25) # 1-100 percent
+dev.get_averaging_threshold()
 
 dev.set_scale_factor(ScaleFactor.LB_TO_GM)
 dev.get_scale_factor()
 
-dev.set_scale_factor('ONE') # ScaleFactor string
+dev.set_scale_factor('LB_TO_GM') # ScaleFactor string
 dev.get_scale_factor()
 
 dev.set_scale_factor(25.4) # float e.g. in to mm
 dev.get_scale_factor()
-
-dev.get_settings()
 ```
 
 
 ## Command Line
 
 ```sh
-loadstar --port /dev/ttyUSB0 --tare --scale-factor LB_TO_GM
+loadstar --help
+# Usage: loadstar [OPTIONS]
+
+```
+
+```sh
+loadstar --info
+
+```
+
+```sh
+loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 5 -t 25 -f 1 -d 10
+
 ```
 
 
@@ -139,3 +153,20 @@ pip install loadstar_sensors_interface
 # Development
 
 [DEVELOPMENT.md](./DEVELOPMENT.md)
+
+
+# Redistributions of source code must retain the above copyright notice, this
+
+list of conditions and the following disclaimer.
+
+
+# Redistributions in binary form must reproduce the above copyright notice, this
+
+list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+
+# Neither the name of HHMI nor the names of its contributors may be used to
+
+endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. \#+END\_SRC

@@ -1,3 +1,5 @@
+;; This file is generated automatically from .single-source-of-truth.org
+;; File edits may be overwritten!
 (require 'org)
 
 (eval-after-load "org"
@@ -27,4 +29,3 @@
   "Tangle and export org file"
   (progn (tangle-org org-file)
          (export-org org-file)))
-

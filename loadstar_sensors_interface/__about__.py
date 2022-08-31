@@ -1,4 +1,4 @@
-# __about__.py is generated automatically from .single-source-of-truth.org
+# This file is generated automatically from .single-source-of-truth.org
 # File edits may be overwritten!
 __version__ = '0.8.0'
 __description__ = 'Python interface to Loadstar Sensors USB devices.'

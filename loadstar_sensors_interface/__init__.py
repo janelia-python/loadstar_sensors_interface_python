@@ -2,7 +2,7 @@
 Python interface to Loadstar Sensors USB devices.
 '''
 
-# __init__.py is generated automatically from .single-source-of-truth.org
+# This file is generated automatically from .single-source-of-truth.org
 # File edits may be overwritten!
 from loadstar_sensors_interface.__about__ import (
     __author__,

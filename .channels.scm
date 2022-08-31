@@ -1,3 +1,5 @@
+;; This file is generated automatically from .single-source-of-truth.org
+;; File edits may be overwritten!
 (list (channel
         (name 'guix)
         (url "https://git.savannah.gnu.org/git/guix.git")

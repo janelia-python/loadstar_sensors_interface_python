@@ -1,6 +1,5 @@
-;; .guix.scm is generated automatically from .single-source-of-truth.org
+;; This file is generated automatically from .single-source-of-truth.org
 ;; File edits may be overwritten!
-
 (use-modules
  (guix packages)
  (guix git-download)

@@ -86,8 +86,10 @@ loadstar
 #+END_SRC
 
 #+BEGIN_EXAMPLE
-<!-- README.md is generated automatically from .single-source-of-truth.org
-File edits may be overwritten! -->
+<!---
+This file is generated automatically from .single-source-of-truth.org
+File edits may be overwritten!
+--->
 #+END_EXAMPLE
 
 * About
@@ -228,9 +230,35 @@ pip install <<name>>
 
 [[./DEVELOPMENT.md][DEVELOPMENT.md]]
 
-* Development.md                                                   :noexport:
+* Tangled Files                                                    :noexport:
+
+#+BEGIN_SRC scheme :tangle .channels.scm :exports none :noweb yes
+;; This file is generated automatically from .single-source-of-truth.org
+;; File edits may be overwritten!
+(list (channel
+        (name 'guix)
+        (url "https://git.savannah.gnu.org/git/guix.git")
+        (branch "master")
+        (commit
+          "eb52b240eb58627cc76a03244c45502c4ec3c50e")
+        (introduction
+          (make-channel-introduction
+            "9edb3f66fd807b096b48283debdcddccfea34bad"
+            (openpgp-fingerprint
+              "BBB0 2DDF 2CEA F6A8 0D1D  E643 A2A0 6DF2 A33A 54FA"))))
+      (channel
+        (name 'guix-janelia)
+        (url "https://github.com/guix-janelia/guix-janelia.git")
+        (branch "main")
+        (commit
+          "5b198ab31894b41b14ba5264858b2420652ce457")))
+#+END_SRC
 
 #+BEGIN_SRC markdown :tangle DEVELOPMENT.md :noweb yes
+<!---
+This file is generated automatically from .single-source-of-truth.org
+File edits may be overwritten!
+--->
 # Install Guix
 [Install Guix](https://guix.gnu.org/manual/en/html_node/Binary-Installation.html)
 
@@ -283,12 +311,44 @@ settings
 ```
 #+END_SRC
 
-* Tangled Files                                                    :noexport:
+#+BEGIN_SRC scheme :tangle .emacs :exports none :noweb yes
+;; This file is generated automatically from .single-source-of-truth.org
+;; File edits may be overwritten!
+(require 'org)
+
+(eval-after-load "org"
+  '(require 'ox-gfm nil t))
+
+(setq make-backup-files nil)
+(setq org-confirm-babel-evaluate nil)
+
+(setq python-indent-guess-indent-offset t)
+(setq python-indent-guess-indent-offset-verbose nil)
+
+(defun tangle-org (org-file)
+  "Tangle org file"
+  (unless (string= "org" (file-name-extension org-file))
+    (error "INFILE must be an org file."))
+  (org-babel-tangle-file org-file))
+
+(defun export-org (org-file)
+  "Export org file to gfm file"
+  (unless (string= "org" (file-name-extension org-file))
+    (error "INFILE must be an org file."))
+  (let ((org-file-buffer (find-file-noselect org-file)))
+    (with-current-buffer org-file-buffer
+      (org-open-file (org-gfm-export-to-markdown)))))
+
+(defun process-org (org-file)
+  "Tangle and export org file"
+  (progn (tangle-org org-file)
+         (export-org org-file)))
+
+#+END_SRC
 
 #+BEGIN_SRC scheme :tangle .guix.scm :exports none :noweb yes
-;; .guix.scm is generated automatically from .single-source-of-truth.org
+;; This file is generated automatically from .single-source-of-truth.org
 ;; File edits may be overwritten!
-
 (use-modules
  (guix packages)
  (guix git-download)
@@ -334,8 +394,74 @@ settings
 python-dev-package
 #+END_SRC
 
+#+BEGIN_SRC text :tangle LICENSE :exports none :noweb yes
+Janelia Open-Source Software
+(3-clause BSD License)
+
+Copyright (c) <<copyright>>
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice, this
+list of conditions and the following disclaimer in the documentation and/or
+other materials provided with the distribution.
+
+* Neither the name of HHMI nor the names of its contributors may be used to
+endorse or promote products derived from this software without specific prior
+written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#+END_SRC
+
+#+BEGIN_SRC text :tangle Makefile :exports none :noweb yes
+dev-shell:
+	guix time-machine -C .channels.scm -- shell --pure -D -f .guix.scm
+
+ipython-shell:
+	guix time-machine -C .channels.scm -- shell --pure -D -f .guix.scm -- ipython
+
+serial-shell:
+	guix shell picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c /dev/ttyUSB0
+
+installed-shell:
+	guix time-machine -C .channels.scm -- shell --pure -f .guix.scm --rebuild-cache
+
+upload: files package twine add clean
+
+edits:
+	emacs -q --no-site-file --no-site-lisp --no-splash -l .emacs --file .single-source-of-truth.org
+
+files:
+	emacs --batch -Q  -l .emacs --eval '(process-org ".single-source-of-truth.org")'
+
+package:
+	python3 setup.py sdist bdist_wheel
+
+twine:
+	twine upload dist/*
+
+add:
+	git add --all
+
+clean:
+	git clean -xdf
+#+END_SRC
+
 #+BEGIN_SRC text :tangle pyproject.toml :exports none :noweb yes
-# pyproject.toml is generated automatically from .single-source-of-truth.org
+# This file is generated automatically from .single-source-of-truth.org
 # File edits may be overwritten!
 [build-system]
 requires = ["setuptools"]
@@ -343,7 +469,7 @@ build-backed = "setuptools.build_meta"
 #+END_SRC
 
 #+BEGIN_SRC text :tangle setup.cfg :exports none :noweb yes
-# setup.cfg is generated automatically from .single-source-of-truth.org
+# This file is generated automatically from .single-source-of-truth.org
 # File edits may be overwritten!
 [metadata]
 name = <<name>>
@@ -370,7 +496,7 @@ console_scripts =
 #+END_SRC
 
 #+BEGIN_SRC python :tangle setup.py :exports none :noweb yes
-# setup.py is generated automatically from .single-source-of-truth.org
+# This file is generated automatically from .single-source-of-truth.org
 # File edits may be overwritten!
 from setuptools import setup
 
@@ -380,7 +506,7 @@ if __name__ == '__main__':
 #+END_SRC
 
 #+BEGIN_SRC python :tangle loadstar_sensors_interface/__about__.py :exports none :noweb yes
-# __about__.py is generated automatically from .single-source-of-truth.org
+# This file is generated automatically from .single-source-of-truth.org
 # File edits may be overwritten!
 __version__ = '<<version>>'
 __description__ = '<<description>>'
@@ -396,7 +522,7 @@ __copyright__ = '<<copyright>>'
 <<description>>
 '''
 
-# __init__.py is generated automatically from .single-source-of-truth.org
+# This file is generated automatically from .single-source-of-truth.org
 # File edits may be overwritten!
 from loadstar_sensors_interface.__about__ import (
     __author__,
