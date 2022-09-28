@@ -8,7 +8,7 @@ loadstar_sensors_interface
 
 #+NAME: version
 #+BEGIN_SRC text :exports none :noweb yes
-0.8.0
+0.9.0
 #+END_SRC
 
 #+NAME: repository-name
@@ -65,14 +65,14 @@ peter@polidoro.io
 #+BEGIN_SRC text :exports none :noweb yes
 serial_interface
 click
-plotext
+plotille
 #+END_SRC
 
 #+NAME: guix-dependencies
 #+BEGIN_SRC text :exports none :noweb yes
 python-serial-interface
 python-click
-python-plotext
+python-plotille
 #+END_SRC
 
 #+NAME: reference
@@ -159,7 +159,7 @@ loadstar --info
 #+END_SRC
 
 #+BEGIN_SRC sh
-loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 5 -t 25 -f 1 -d 10
+loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 5 -d 10
 
 #+END_SRC
 
@@ -240,7 +240,7 @@ pip install <<name>>
         (url "https://git.savannah.gnu.org/git/guix.git")
         (branch "master")
         (commit
-          "eb52b240eb58627cc76a03244c45502c4ec3c50e")
+          "79b8e52e642ddb6e4abd38535b129f30e0540e0c")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"
@@ -251,7 +251,7 @@ pip install <<name>>
         (url "https://github.com/guix-janelia/guix-janelia.git")
         (branch "main")
         (commit
-          "5b198ab31894b41b14ba5264858b2420652ce457")))
+          "66cfda54857481a55b905af964ecc3f060918b9a")))
 #+END_SRC
 
 #+BEGIN_SRC markdown :tangle DEVELOPMENT.md :noweb yes

@@ -38,7 +38,7 @@
                         ncurses
                         python-serial-interface
                         python-click
-                        python-plotext))
+                        python-plotille))
     (home-page "")
     (synopsis "")
     (description "")
