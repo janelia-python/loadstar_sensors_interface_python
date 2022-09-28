@@ -37,8 +37,7 @@
     (propagated-inputs (list
                         ncurses
                         python-serial-interface
-                        python-click
-                        python-plotille))
+                        python-click))
     (home-page "")
     (synopsis "")
     (description "")

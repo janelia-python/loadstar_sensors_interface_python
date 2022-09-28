@@ -2,7 +2,6 @@
 import click
 import time
 from threading import Timer
-# import plotille
 import os
 
 from .loadstar_sensors_interface import LoadstarSensorsInterface, ScaleFactor
@@ -39,7 +38,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               show_default=True,
               help='Percentage of capacity below which average is performed. (1-100%).')
 @click.option('-f', '--frequency',
-              default=1,
+              default=2,
               show_default=True,
               help='Frequency of sensor value measurements in Hz.')
 @click.option('-d', '--duration',
@@ -124,8 +123,7 @@ class LoadstarSensorsPlotter():
 
     def plot(self):
         """Start plotting."""
-        self._data = [0 for i in range(0, self._datum_count)]
-        self._datum_index = 0
+        self._index = 0
         self._plotting = True
         self._time_start = None
         self._timer.start()
@@ -136,24 +134,15 @@ class LoadstarSensorsPlotter():
     def _draw(self):
         if not self._time_start:
             self._time_start = time.time()
-        if self._datum_index >= self._datum_count:
+        if self._index >= self._datum_count:
             self._plotting = False
             return
         t = time.time() - self._time_start
         sensor_value = self._device.get_sensor_value()
-        # self._data[self._datum_index] = sensor_value
-        self._datum_index += 1
+        self._index += 1
         s = 'time: {0:.1f}, datum_count: {1}, sensor_value: {2}'
-        s = s.format(t, self._datum_index, sensor_value)
+        s = s.format(t, self._index, sensor_value)
         print(s)
-        # plt.clt()
-        # plt.cld()
-        # plt.title(f'Sensor Values time: {t:.1f}, datum_count: {self._datum_index}')
-        # plt.ylim(0, self._max_value)
-        # plt.plot(self._data)
-
-        # plt.sleep(0.001)
-        # plt.show()
 
 
 if __name__ == '__main__':

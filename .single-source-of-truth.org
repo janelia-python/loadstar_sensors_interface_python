@@ -65,14 +65,12 @@ peter@polidoro.io
 #+BEGIN_SRC text :exports none :noweb yes
 serial_interface
 click
-plotille
 #+END_SRC
 
 #+NAME: guix-dependencies
 #+BEGIN_SRC text :exports none :noweb yes
 python-serial-interface
 python-click
-python-plotille
 #+END_SRC
 
 #+NAME: reference
@@ -159,7 +157,7 @@ loadstar --info
 #+END_SRC
 
 #+BEGIN_SRC sh
-loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 5 -d 10
+loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
 
 #+END_SRC
 
