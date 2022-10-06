@@ -8,7 +8,7 @@
 
 ```markdown
 - Name: loadstar_sensors_interface
-- Version: 0.8.0
+- Version: 0.9.0
 - Description: Python interface to Loadstar Sensors USB devices.
 - License: BSD 3-Clause License
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -19,7 +19,6 @@
 - Dependencies:
   - serial_interface
   - click
-  - plotext
 ```
 
 
@@ -74,7 +73,7 @@ loadstar --info
 ```
 
 ```sh
-loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 5 -t 25 -f 1 -d 10
+loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
 
 ```
 
