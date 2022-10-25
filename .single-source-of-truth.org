@@ -11,14 +11,24 @@ loadstar_sensors_interface
 0.9.0
 #+END_SRC
 
-#+NAME: repository-name
+#+NAME: release-month-day
 #+BEGIN_SRC text :exports none :noweb yes
-loadstar_sensors_interface_python
+10-25
 #+END_SRC
 
-#+NAME: guix-name
+#+NAME: release-year
 #+BEGIN_SRC text :exports none :noweb yes
-python-loadstar-sensors-interface
+2022
+#+END_SRC
+
+#+NAME: release-date
+#+BEGIN_SRC text :exports none :noweb yes
+<<release-year>>-<<release-month-day>>
+#+END_SRC
+
+#+NAME: creation-date
+#+BEGIN_SRC text :exports none :noweb yes
+2022-08-16
 #+END_SRC
 
 #+NAME: description
@@ -28,7 +38,7 @@ Python interface to Loadstar Sensors USB devices.
 
 #+NAME: license
 #+BEGIN_SRC text :exports none :noweb yes
-BSD 3-Clause License
+BSD-3-Clause
 #+END_SRC
 
 #+NAME: guix-license
@@ -41,14 +51,39 @@ license:bsd-3
 LICENSE
 #+END_SRC
 
+#+NAME: repository-name
+#+BEGIN_SRC text :exports none :noweb yes
+loadstar_sensors_interface_python
+#+END_SRC
+
+#+NAME: guix-name
+#+BEGIN_SRC text :exports none :noweb yes
+python-loadstar-sensors-interface
+#+END_SRC
+
 #+NAME: url
 #+BEGIN_SRC text :exports none :noweb yes
 https://github.com/janelia-pypi/<<repository-name>>
 #+END_SRC
 
+#+NAME: code-repository
+#+BEGIN_SRC text :exports none :noweb yes
+git+<<url>>.git
+#+END_SRC
+
+#+NAME: author-given-name
+#+BEGIN_SRC text :exports none :noweb yes
+Peter
+#+END_SRC
+
+#+NAME: author-family-name
+#+BEGIN_SRC text :exports none :noweb yes
+Polidoro
+#+END_SRC
+
 #+NAME: author
 #+BEGIN_SRC text :exports none :noweb yes
-Peter Polidoro
+<<author-given-name>> <<author-family-name>>
 #+END_SRC
 
 #+NAME: email
@@ -56,9 +91,14 @@ Peter Polidoro
 peter@polidoro.io
 #+END_SRC
 
-#+NAME: copyright
+#+NAME: affiliation
 #+BEGIN_SRC text :exports none :noweb yes
-2022 Howard Hughes Medical Institute
+Howard Hughes Medical Institute
+#+END_SRC
+
+#+NAME: programming-language
+#+BEGIN_SRC text :exports none :noweb yes
+Python 3
 #+END_SRC
 
 #+NAME: python-dependencies
@@ -94,8 +134,9 @@ File edits may be overwritten!
 
 #+BEGIN_SRC markdown :noweb yes
 - Name: <<name>>
-- Version: <<version>>
 - Description: <<description>>
+- Version: <<version>>
+- Date: <<release-date>>
 - License: <<license>>
 - URL: <<url>>
 - Author: <<author>>
@@ -230,6 +271,70 @@ pip install <<name>>
 
 * Tangled Files                                                    :noexport:
 
+#+BEGIN_SRC text :tangle LICENSE :exports none :noweb yes
+Janelia Open-Source Software (3-clause BSD License)
+
+Copyright <<release-year>> <<affiliation>>
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation and/or
+other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors
+may be used to endorse or promote products derived from this software without
+specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#+END_SRC
+
+#+BEGIN_SRC text :tangle AUTHORS :exports none :noweb yes
+<<author>>
+#+END_SRC
+
+#+BEGIN_SRC js :tangle codemeta.json :exports none :noweb yes
+{
+    "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+    "@type": "SoftwareSourceCode",
+    "license": "https://spdx.org/licenses/BSD-3-Clause",
+    "codeRepository": "git+https://github.com/janelia-pypi/loadstar_sensors_interface_python.git",
+    "dateCreated": "2022-08-16",
+    "dateModified": "2022-10-25",
+    "name": "loadstar_sensors_interface",
+    "version": "0.9.0",
+    "description": "Python interface to Loadstar Sensors USB devices.",
+    "programmingLanguage": [
+        "Python 3"
+    ],
+    "author": [
+        {
+            "@type": "Person",
+            "givenName": "Peter",
+            "familyName": "Polidoro",
+            "email": "peter@polidoro.io",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "Howard Hughes Medical Institute"
+            }
+        }
+    ]
+}
+#+END_SRC
+
 #+BEGIN_SRC scheme :tangle .channels.scm :exports none :noweb yes
 ;; This file is generated automatically from .single-source-of-truth.org
 ;; File edits may be overwritten!
@@ -250,6 +355,88 @@ pip install <<name>>
         (branch "main")
         (commit
           "a082913f2dcfd0aa7d1922e780880505aaf3e2d9")))
+#+END_SRC
+
+#+BEGIN_SRC scheme :tangle .guix.scm :exports none :noweb yes
+;; This file is generated automatically from .single-source-of-truth.org
+;; File edits may be overwritten!
+(use-modules
+ (guix packages)
+ (guix git-download)
+ (guix gexp)
+ ((guix licenses) #:prefix license:)
+ (guix build-system python)
+ (gnu packages base)
+ (gnu packages emacs)
+ (gnu packages emacs-xyz)
+ (gnu packages python-build)
+ (gnu packages python-xyz)
+ (gnu packages version-control)
+ (gnu packages ncurses)
+ (guix-janelia packages python-janelia)
+ (guix-janelia packages python-xyz))
+
+(define %source-dir (dirname (current-filename)))
+
+(define-public python-dev-package
+  (package
+    (name "python-dev-package")
+    (version "dev")
+    (source (local-file %source-dir
+                        #:recursive? #t
+                        #:select? (git-predicate %source-dir)))
+    (build-system python-build-system)
+    (native-inputs (list gnu-make
+                         git
+                         emacs
+                         emacs-org
+                         emacs-ox-gfm
+                         python-wheel
+                         python-twine
+                         python-ipython))
+    (propagated-inputs (list
+                        ncurses
+                        <<guix-dependencies>>))
+    (home-page "")
+    (synopsis "")
+    (description "")
+    (license <<guix-license>>)))
+
+python-dev-package
+#+END_SRC
+
+#+BEGIN_SRC text :tangle Makefile :exports none :noweb yes
+upload: files package twine add clean
+
+dev-shell:
+	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm
+
+ipython-shell:
+	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- ipython
+
+serial-shell:
+	guix shell picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c /dev/ttyUSB0
+
+installed-shell:
+	guix time-machine -C .channels.scm -- shell --container -f .guix.scm --rebuild-cache
+
+edits:
+	guix time-machine -C .channels.scm -- shell --container --preserve='^DISPLAY$$' --preserve='^TERM$$' -D -f .guix.scm -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l .emacs --file .single-source-of-truth.org"
+
+files:
+	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "emacs --batch -Q  -l .emacs --eval '(process-org \".single-source-of-truth.org\")'"
+
+package:
+	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "python3 setup.py sdist bdist_wheel"
+
+twine:
+	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "twine upload dist/*"
+
+add:
+	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "git add --all"
+
+clean:
+	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "git clean -xdf"
 #+END_SRC
 
 #+BEGIN_SRC markdown :tangle DEVELOPMENT.md :noweb yes
@@ -343,120 +530,6 @@ settings
   (progn (tangle-org org-file)
          (export-org org-file)))
 
-#+END_SRC
-
-#+BEGIN_SRC scheme :tangle .guix.scm :exports none :noweb yes
-;; This file is generated automatically from .single-source-of-truth.org
-;; File edits may be overwritten!
-(use-modules
- (guix packages)
- (guix git-download)
- (guix gexp)
- ((guix licenses) #:prefix license:)
- (guix build-system python)
- (gnu packages base)
- (gnu packages emacs)
- (gnu packages emacs-xyz)
- (gnu packages python-build)
- (gnu packages python-xyz)
- (gnu packages version-control)
- (gnu packages ncurses)
- (guix-janelia packages python-janelia)
- (guix-janelia packages python-xyz))
-
-(define %source-dir (dirname (current-filename)))
-
-(define-public python-dev-package
-  (package
-    (name "python-dev-package")
-    (version "dev")
-    (source (local-file %source-dir
-                        #:recursive? #t
-                        #:select? (git-predicate %source-dir)))
-    (build-system python-build-system)
-    (native-inputs (list gnu-make
-                         git
-                         emacs
-                         emacs-org
-                         emacs-ox-gfm
-                         python-wheel
-                         python-twine
-                         python-ipython))
-    (propagated-inputs (list
-                        ncurses
-                        <<guix-dependencies>>))
-    (home-page "")
-    (synopsis "")
-    (description "")
-    (license <<guix-license>>)))
-
-python-dev-package
-#+END_SRC
-
-#+BEGIN_SRC text :tangle LICENSE :exports none :noweb yes
-Janelia Open-Source Software
-(3-clause BSD License)
-
-Copyright (c) <<copyright>>
-
-Redistribution and use in source and binary forms, with or without modification,
-are permitted provided that the following conditions are met:
-
-* Redistributions of source code must retain the above copyright notice, this
-list of conditions and the following disclaimer.
-
-* Redistributions in binary form must reproduce the above copyright notice, this
-list of conditions and the following disclaimer in the documentation and/or
-other materials provided with the distribution.
-
-* Neither the name of HHMI nor the names of its contributors may be used to
-endorse or promote products derived from this software without specific prior
-written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#+END_SRC
-
-#+BEGIN_SRC text :tangle Makefile :exports none :noweb yes
-upload: files package twine add clean
-
-dev-shell:
-	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm
-
-ipython-shell:
-	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- ipython
-
-serial-shell:
-	guix shell picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c /dev/ttyUSB0
-
-installed-shell:
-	guix time-machine -C .channels.scm -- shell --container -f .guix.scm --rebuild-cache
-
-edits:
-	guix time-machine -C .channels.scm -- shell --container --preserve='^DISPLAY$$' --preserve='^TERM$$' -D -f .guix.scm -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l .emacs --file .single-source-of-truth.org"
-
-files:
-	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "emacs --batch -Q  -l .emacs --eval '(process-org \".single-source-of-truth.org\")'"
-
-package:
-	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "python3 setup.py sdist bdist_wheel"
-
-twine:
-	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "twine upload dist/*"
-
-add:
-	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "git add --all"
-
-clean:
-	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "git clean -xdf"
 #+END_SRC
 
 #+BEGIN_SRC text :tangle pyproject.toml :exports none :noweb yes
