@@ -15,10 +15,13 @@ cd loadstar_sensors_interface_python
 # Edit .single-source-of-truth
 
 ```shell
-make dev-shell
 make edits
+```
+
+# Tangle .single-source-of-truth
+
+```shell
 make files
-exit
 ```
 
 # Test Python package using ipython shell
@@ -39,9 +42,7 @@ exit
 # Upload Python package to pypi
 
 ```shell
-make dev-shell
 make upload
-exit
 ```
 
 # Test direct device interaction using serial terminal

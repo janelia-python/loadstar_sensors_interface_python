@@ -238,7 +238,7 @@ pip install <<name>>
         (url "https://git.savannah.gnu.org/git/guix.git")
         (branch "master")
         (commit
-          "79b8e52e642ddb6e4abd38535b129f30e0540e0c")
+          "a0751e3250dfea7e52468c8090e18c3118d93a60")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"
@@ -249,7 +249,7 @@ pip install <<name>>
         (url "https://github.com/guix-janelia/guix-janelia.git")
         (branch "main")
         (commit
-          "66cfda54857481a55b905af964ecc3f060918b9a")))
+          "a082913f2dcfd0aa7d1922e780880505aaf3e2d9")))
 #+END_SRC
 
 #+BEGIN_SRC markdown :tangle DEVELOPMENT.md :noweb yes
@@ -270,10 +270,13 @@ cd <<repository-name>>
 # Edit .single-source-of-truth
 
 ```shell
-make dev-shell
 make edits
+```
+
+# Tangle .single-source-of-truth
+
+```shell
 make files
-exit
 ```
 
 # Test Python package using ipython shell
@@ -294,9 +297,7 @@ exit
 # Upload Python package to pypi
 
 ```shell
-make dev-shell
 make upload
-exit
 ```
 
 # Test direct device interaction using serial terminal
@@ -425,37 +426,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #+END_SRC
 
 #+BEGIN_SRC text :tangle Makefile :exports none :noweb yes
+upload: files package twine add clean
+
 dev-shell:
-	guix time-machine -C .channels.scm -- shell --pure -D -f .guix.scm
+	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm
 
 ipython-shell:
-	guix time-machine -C .channels.scm -- shell --pure -D -f .guix.scm -- ipython
+	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- ipython
 
 serial-shell:
 	guix shell picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c /dev/ttyUSB0
 
 installed-shell:
-	guix time-machine -C .channels.scm -- shell --pure -f .guix.scm --rebuild-cache
-
-upload: files package twine add clean
+	guix time-machine -C .channels.scm -- shell --container -f .guix.scm --rebuild-cache
 
 edits:
-	emacs -q --no-site-file --no-site-lisp --no-splash -l .emacs --file .single-source-of-truth.org
+	guix time-machine -C .channels.scm -- shell --container --preserve='^DISPLAY$$' --preserve='^TERM$$' -D -f .guix.scm -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l .emacs --file .single-source-of-truth.org"
 
 files:
-	emacs --batch -Q  -l .emacs --eval '(process-org ".single-source-of-truth.org")'
+	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "emacs --batch -Q  -l .emacs --eval '(process-org \".single-source-of-truth.org\")'"
 
 package:
-	python3 setup.py sdist bdist_wheel
+	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "python3 setup.py sdist bdist_wheel"
 
 twine:
-	twine upload dist/*
+	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "twine upload dist/*"
 
 add:
-	git add --all
+	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "git add --all"
 
 clean:
-	git clean -xdf
+	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "git clean -xdf"
 #+END_SRC
 
 #+BEGIN_SRC text :tangle pyproject.toml :exports none :noweb yes
