@@ -1,4 +1,4 @@
-# This file is generated automatically from .single-source-of-truth.org
+# This file is generated automatically from .metadata.org
 # File edits may be overwritten!
 from setuptools import setup
 

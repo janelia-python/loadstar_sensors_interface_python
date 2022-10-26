@@ -1,5 +1,5 @@
 <!---
-    This file is generated automatically from .single-source-of-truth.org
+    This file is generated automatically from .metadata.org
     File edits may be overwritten!
     --->
 
@@ -8,9 +8,10 @@
 
 ```markdown
 - Name: loadstar_sensors_interface
-- Version: 0.9.0
 - Description: Python interface to Loadstar Sensors USB devices.
-- License: BSD 3-Clause License
+- Version: 0.9.0
+- Date: 2022-10-26
+- License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
 - Author: Peter Polidoro
 - Email: peter@polidoro.io
@@ -151,21 +152,63 @@ pip install loadstar_sensors_interface
 
 # Development
 
-[DEVELOPMENT.md](./DEVELOPMENT.md)
+
+## Install Guix
+
+[Install Guix](https://guix.gnu.org/manual/en/html_node/Binary-Installation.html)
 
 
-# Redistributions of source code must retain the above copyright notice, this
+## Clone Repository
 
-list of conditions and the following disclaimer.
-
-
-# Redistributions in binary form must reproduce the above copyright notice, this
-
-list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+```sh
+git clone https://github.com/janelia-pypi/loadstar_sensors_interface_python
+cd loadstar_sensors_interface_python
+```
 
 
-# Neither the name of HHMI nor the names of its contributors may be used to
+## Edit .metadata.org
 
-endorse or promote products derived from this software without specific prior written permission.
+```sh
+make edits
+```
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. \#+END\_SRC
+
+## Tangle .metadata.org
+
+```sh
+make files
+```
+
+
+## Test Python package using ipython shell
+
+```sh
+make ipython-shell
+import loadstar_sensors_interface
+exit
+```
+
+
+## Test installation of Guix package
+
+```sh
+make installed-shell
+exit
+```
+
+
+## Upload Python package to pypi
+
+```sh
+make upload
+```
+
+
+## Test direct device interaction using serial terminal
+
+```sh
+make serial-shell
+? # help
+settings
+[C-a][C-x] # to exit
+```

@@ -13,7 +13,7 @@ loadstar_sensors_interface
 
 #+NAME: release-month-day
 #+BEGIN_SRC text :exports none :noweb yes
-10-25
+10-26
 #+END_SRC
 
 #+NAME: release-year
@@ -61,14 +61,14 @@ loadstar_sensors_interface_python
 python-loadstar-sensors-interface
 #+END_SRC
 
-#+NAME: url
+#+NAME: repository-url
 #+BEGIN_SRC text :exports none :noweb yes
 https://github.com/janelia-pypi/<<repository-name>>
 #+END_SRC
 
 #+NAME: code-repository
 #+BEGIN_SRC text :exports none :noweb yes
-git+<<url>>.git
+git+<<repository-url>>.git
 #+END_SRC
 
 #+NAME: author-given-name
@@ -94,6 +94,11 @@ peter@polidoro.io
 #+NAME: affiliation
 #+BEGIN_SRC text :exports none :noweb yes
 Howard Hughes Medical Institute
+#+END_SRC
+
+#+NAME: copyright
+#+BEGIN_SRC text :exports none :noweb yes
+<<release-year>> <<affiliation>>
 #+END_SRC
 
 #+NAME: programming-language
@@ -125,7 +130,7 @@ loadstar
 
 #+BEGIN_EXAMPLE
 <!---
-This file is generated automatically from .single-source-of-truth.org
+This file is generated automatically from .metadata.org
 File edits may be overwritten!
 --->
 #+END_EXAMPLE
@@ -138,7 +143,7 @@ File edits may be overwritten!
 - Version: <<version>>
 - Date: <<release-date>>
 - License: <<license>>
-- URL: <<url>>
+- URL: <<repository-url>>
 - Author: <<author>>
 - Email: <<email>>
 - Copyright: <<copyright>>
@@ -267,9 +272,64 @@ pip install <<name>>
 
 * Development
 
-[[./DEVELOPMENT.md][DEVELOPMENT.md]]
+** Install Guix
+
+[[https://guix.gnu.org/manual/en/html_node/Binary-Installation.html][Install Guix]]
+
+** Clone Repository
+
+#+BEGIN_SRC sh :noweb yes
+git clone <<repository-url>>
+cd <<repository-name>>
+#+END_SRC
+
+** Edit .metadata.org
+
+#+BEGIN_SRC sh :noweb yes
+make edits
+#+END_SRC
+
+** Tangle .metadata.org
+
+#+BEGIN_SRC sh :noweb yes
+make files
+#+END_SRC
+
+** Test Python package using ipython shell
+
+#+BEGIN_SRC sh :noweb yes
+make ipython-shell
+import <<name>>
+exit
+#+END_SRC
+
+** Test installation of Guix package
+
+#+BEGIN_SRC sh :noweb yes
+make installed-shell
+exit
+#+END_SRC
+
+** Upload Python package to pypi
+
+#+BEGIN_SRC sh :noweb yes
+make upload
+#+END_SRC
+
+** Test direct device interaction using serial terminal
+
+#+BEGIN_SRC sh :noweb yes
+make serial-shell
+? # help
+settings
+[C-a][C-x] # to exit
+#+END_SRC
 
 * Tangled Files                                                    :noexport:
+
+#+BEGIN_SRC text :tangle AUTHORS :exports none :noweb yes
+<<author>>
+#+END_SRC
 
 #+BEGIN_SRC text :tangle LICENSE :exports none :noweb yes
 Janelia Open-Source Software (3-clause BSD License)
@@ -302,33 +362,29 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #+END_SRC
 
-#+BEGIN_SRC text :tangle AUTHORS :exports none :noweb yes
-<<author>>
-#+END_SRC
-
 #+BEGIN_SRC js :tangle codemeta.json :exports none :noweb yes
 {
     "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
     "@type": "SoftwareSourceCode",
-    "license": "https://spdx.org/licenses/BSD-3-Clause",
-    "codeRepository": "git+https://github.com/janelia-pypi/loadstar_sensors_interface_python.git",
-    "dateCreated": "2022-08-16",
-    "dateModified": "2022-10-25",
-    "name": "loadstar_sensors_interface",
-    "version": "0.9.0",
-    "description": "Python interface to Loadstar Sensors USB devices.",
+    "license": "https://spdx.org/licenses/<<license>>",
+    "codeRepository": "<<code-repository>>",
+    "dateCreated": "<<creation-date>>",
+    "dateModified": "<<release-date>>",
+    "name": "<<name>>",
+    "version": "<<version>>",
+    "description": "<<description>>",
     "programmingLanguage": [
-        "Python 3"
+        "<<programming-language>>"
     ],
     "author": [
         {
             "@type": "Person",
-            "givenName": "Peter",
-            "familyName": "Polidoro",
-            "email": "peter@polidoro.io",
+            "givenName": "<<author-given-name>>",
+            "familyName": "<<author-family-name>>",
+            "email": "<<email>>",
             "affiliation": {
                 "@type": "Organization",
-                "name": "Howard Hughes Medical Institute"
+                "name": "<<affiliation>>"
             }
         }
     ]
@@ -336,7 +392,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #+END_SRC
 
 #+BEGIN_SRC scheme :tangle .channels.scm :exports none :noweb yes
-;; This file is generated automatically from .single-source-of-truth.org
+;; This file is generated automatically from .metadata.org
 ;; File edits may be overwritten!
 (list (channel
         (name 'guix)
@@ -358,7 +414,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #+END_SRC
 
 #+BEGIN_SRC scheme :tangle .guix.scm :exports none :noweb yes
-;; This file is generated automatically from .single-source-of-truth.org
+;; This file is generated automatically from .metadata.org
 ;; File edits may be overwritten!
 (use-modules
  (guix packages)
@@ -406,6 +462,9 @@ python-dev-package
 #+END_SRC
 
 #+BEGIN_SRC text :tangle Makefile :exports none :noweb yes
+# This file is generated automatically from .metadata.org
+# File edits may be overwritten!
+
 upload: files package twine add clean
 
 dev-shell:
@@ -421,10 +480,10 @@ installed-shell:
 	guix time-machine -C .channels.scm -- shell --container -f .guix.scm --rebuild-cache
 
 edits:
-	guix time-machine -C .channels.scm -- shell --container --preserve='^DISPLAY$$' --preserve='^TERM$$' -D -f .guix.scm -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l .emacs --file .single-source-of-truth.org"
+	guix time-machine -C .channels.scm -- shell --container --preserve='^DISPLAY$$' --preserve='^TERM$$' -D -f .guix.scm -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l .init.el --file .metadata.org"
 
 files:
-	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "emacs --batch -Q  -l .emacs --eval '(process-org \".single-source-of-truth.org\")'"
+	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "emacs --batch -Q  -l .init.el --eval '(process-org \".metadata.org\")'"
 
 package:
 	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "python3 setup.py sdist bdist_wheel"
@@ -439,66 +498,8 @@ clean:
 	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "git clean -xdf"
 #+END_SRC
 
-#+BEGIN_SRC markdown :tangle DEVELOPMENT.md :noweb yes
-<!---
-This file is generated automatically from .single-source-of-truth.org
-File edits may be overwritten!
---->
-# Install Guix
-[Install Guix](https://guix.gnu.org/manual/en/html_node/Binary-Installation.html)
-
-# Clone Repository
-
-```shell
-git clone <<url>>
-cd <<repository-name>>
-```
-
-# Edit .single-source-of-truth
-
-```shell
-make edits
-```
-
-# Tangle .single-source-of-truth
-
-```shell
-make files
-```
-
-# Test Python package using ipython shell
-
-```shell
-make ipython-shell
-import <<name>>
-exit
-```
-
-# Test installation of Guix package
-
-```shell
-make installed-shell
-exit
-```
-
-# Upload Python package to pypi
-
-```shell
-make upload
-```
-
-# Test direct device interaction using serial terminal
-
-```shell
-make serial-shell
-? # help
-settings
-[C-a][C-x] # to exit
-```
-#+END_SRC
-
-#+BEGIN_SRC scheme :tangle .emacs :exports none :noweb yes
-;; This file is generated automatically from .single-source-of-truth.org
+#+BEGIN_SRC scheme :tangle .init.el :exports none :noweb yes
+;; This file is generated automatically from .metadata.org
 ;; File edits may be overwritten!
 (require 'org)
 
@@ -533,7 +534,7 @@ settings
 #+END_SRC
 
 #+BEGIN_SRC text :tangle pyproject.toml :exports none :noweb yes
-# This file is generated automatically from .single-source-of-truth.org
+# This file is generated automatically from .metadata.org
 # File edits may be overwritten!
 [build-system]
 requires = ["setuptools"]
@@ -541,14 +542,14 @@ build-backed = "setuptools.build_meta"
 #+END_SRC
 
 #+BEGIN_SRC text :tangle setup.cfg :exports none :noweb yes
-# This file is generated automatically from .single-source-of-truth.org
+# This file is generated automatically from .metadata.org
 # File edits may be overwritten!
 [metadata]
 name = <<name>>
 version = <<version>>
 author = <<author>>
 author_email = <<email>>
-url = <<url>>
+url = <<repository-url>>
 description = <<description>>
 long_description = file: README.md
 long_description_content_type = text/markdown
@@ -568,7 +569,7 @@ console_scripts =
 #+END_SRC
 
 #+BEGIN_SRC python :tangle setup.py :exports none :noweb yes
-# This file is generated automatically from .single-source-of-truth.org
+# This file is generated automatically from .metadata.org
 # File edits may be overwritten!
 from setuptools import setup
 
@@ -578,12 +579,12 @@ if __name__ == '__main__':
 #+END_SRC
 
 #+BEGIN_SRC python :tangle loadstar_sensors_interface/__about__.py :exports none :noweb yes
-# This file is generated automatically from .single-source-of-truth.org
+# This file is generated automatically from .metadata.org
 # File edits may be overwritten!
 __version__ = '<<version>>'
 __description__ = '<<description>>'
 __license__ = '<<license>>'
-__url__ = '<<url>>'
+__url__ = '<<repository-url>>'
 __author__ = '<<author>>'
 __email__ = '<<email>>'
 __copyright__ = '<<copyright>>'
@@ -594,7 +595,7 @@ __copyright__ = '<<copyright>>'
 <<description>>
 '''
 
-# This file is generated automatically from .single-source-of-truth.org
+# This file is generated automatically from .metadata.org
 # File edits may be overwritten!
 from loadstar_sensors_interface.__about__ import (
     __author__,
