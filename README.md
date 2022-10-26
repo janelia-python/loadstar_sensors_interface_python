@@ -31,7 +31,7 @@
 ```python
 from loadstar_sensors_interface import LoadstarSensorsInterface, ScaleFactor
 dev = LoadstarSensorsInterface() # Try to automatically detect port
-dev = LoadstarSensorsInterface(port='/dev/ttyUSB0') # Linux specific port
+dev = LoadstarSensorsInterface(port='/dev/ttyUSB0') # GNU/Linux specific port
 dev = LoadstarSensorsInterface(port='/dev/tty.usbmodem262471') # Mac OS X specific port
 dev = LoadstarSensorsInterface(port='COM3') # Windows specific port
 
@@ -84,10 +84,20 @@ loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
 <https://github.com/janelia-pypi/python_setup>
 
 
-## Linux
+## GNU/Linux
 
 
-### udev rules
+### Drivers
+
+GNU/Linux computers usually have all of the necessary drivers already installed, but users need the appropriate permissions to open the device and communicate with it.
+
+Udev is the GNU/Linux subsystem that detects when things are plugged into your computer.
+
+Udev may be used to detect when a loadstar sensor is plugged into the computer and automatically give permission to open that device.
+
+If you plug a sensor into your computer and attempt to open it and get an error such as: "FATAL: cannot open /dev/ttyUSB0: Permission denied", then you need to install udev rules to give permission to open that device.
+
+Udev rules may be downloaded as a file and placed in the appropriate directory using these instructions:
 
 [99-platformio-udev.rules](https://docs.platformio.org/en/stable/core/installation/udev-rules.html)
 
@@ -111,43 +121,50 @@ sudo usermod -a -G plugdev $USER
 ```
 
 
-### pip
+### Python Code
 
-```sh
-python3 -m venv ~/venvs/loadstar_sensors_interface
-source ~/venvs/loadstar_sensors_interface/bin/activate
-pip install loadstar_sensors_interface
-```
+The Python code in this library may be installed in any number of ways, chose one.
 
+1.  pip
 
-### guix
+    ```sh
+    python3 -m venv ~/venvs/loadstar_sensors_interface
+    source ~/venvs/loadstar_sensors_interface/bin/activate
+    pip install loadstar_sensors_interface
+    ```
 
-Setup guix-janelia channel:
+2.  guix
 
-<https://github.com/guix-janelia/guix-janelia>
-
-```sh
-guix install python-loadstar-sensors-interface
-```
+    Setup guix-janelia channel:
+    
+    <https://github.com/guix-janelia/guix-janelia>
+    
+    ```sh
+    guix install python-loadstar-sensors-interface
+    ```
 
 
 ## Windows
 
 
-### drivers
+### Drivers
 
 Download and install Windows driver:
 
 [Loadstar Sensors Windows Driver](https://www.loadstarsensors.com/drivers-for-usb-load-cells-and-load-cell-interfaces.html)
 
 
-### pip
+### Python Code
 
-```sh
-python3 -m venv C:\venvs\loadstar_sensors_interface
-C:\venvs\loadstar_sensors_interface\Scripts\activate
-pip install loadstar_sensors_interface
-```
+The Python code in this library may be installed in any number of ways, chose one.
+
+1.  pip
+
+    ```sh
+    python3 -m venv C:\venvs\loadstar_sensors_interface
+    C:\venvs\loadstar_sensors_interface\Scripts\activate
+    pip install loadstar_sensors_interface
+    ```
 
 
 # Development
