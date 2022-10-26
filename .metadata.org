@@ -234,24 +234,30 @@ using these instructions:
 
 [[https://docs.platformio.org/en/stable/core/installation/udev-rules.html][99-platformio-udev.rules]]
 
+**** Download rules into the correct directory
+
 #+BEGIN_SRC sh :noweb yes
-# Recommended
 curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules
+#+END_SRC
 
-# OR, manually download and copy this file to destination folder
-sudo cp 99-platformio-udev.rules /etc/udev/rules.d/99-platformio-udev.rules
+**** Restart udev management tool
 
-# Restart udev management tool
+#+BEGIN_SRC sh :noweb yes
 sudo service udev restart
+#+END_SRC
 
-# or
-sudo udevadm control --reload-rules
-sudo udevadm trigger
+**** Ubuntu/Debian users may need to add own “username” to the “dialout” group
 
-# Ubuntu/Debian users may need to add own “username” to the “dialout” group
+#+BEGIN_SRC sh :noweb yes
 sudo usermod -a -G dialout $USER
 sudo usermod -a -G plugdev $USER
 #+END_SRC
+
+**** After setting up rules and groups
+
+You will need to log out and log back in again (or reboot) for the user group changes to take effect.
+
+After this file is installed, physically unplug and reconnect your board.
 
 *** Python Code
 
