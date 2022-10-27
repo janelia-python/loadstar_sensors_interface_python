@@ -29,7 +29,7 @@
 ## Python
 
 ```python
-from loadstar_sensors_interface import LoadstarSensorsInterface, ScaleFactor
+from loadstar_sensors_interface import LoadstarSensorsInterface
 dev = LoadstarSensorsInterface() # Try to automatically detect port
 dev = LoadstarSensorsInterface(port='/dev/ttyUSB0') # GNU/Linux specific port
 dev = LoadstarSensorsInterface(port='/dev/tty.usbmodem262471') # Mac OS X specific port
@@ -48,15 +48,6 @@ dev.set_averaging_window(5) # 1-1024 samples
 dev.get_averaging_window()
 dev.set_averaging_threshold(25) # 1-100 percent
 dev.get_averaging_threshold()
-
-dev.set_scale_factor(ScaleFactor.LB_TO_GM)
-dev.get_scale_factor()
-
-dev.set_scale_factor('LB_TO_GM') # ScaleFactor string
-dev.get_scale_factor()
-
-dev.set_scale_factor(25.4) # float e.g. in to mm
-dev.get_scale_factor()
 ```
 
 
@@ -192,14 +183,14 @@ cd loadstar_sensors_interface_python
 ## Edit .metadata.org
 
 ```sh
-make edits
+make metadata-edits
 ```
 
 
 ## Tangle .metadata.org
 
 ```sh
-make files
+make metadata
 ```
 
 

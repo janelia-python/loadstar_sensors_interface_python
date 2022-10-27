@@ -13,4 +13,4 @@ from loadstar_sensors_interface.__about__ import (
     __url__,
     __version__)
 
-from .loadstar_sensors_interface import LoadstarSensorsInterface, ScaleFactor
+from .loadstar_sensors_interface import LoadstarSensorsInterface

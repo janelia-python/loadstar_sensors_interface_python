@@ -157,7 +157,7 @@ File edits may be overwritten!
 ** Python
 
 #+BEGIN_SRC python
-from loadstar_sensors_interface import LoadstarSensorsInterface, ScaleFactor
+from loadstar_sensors_interface import LoadstarSensorsInterface
 dev = LoadstarSensorsInterface() # Try to automatically detect port
 dev = LoadstarSensorsInterface(port='/dev/ttyUSB0') # GNU/Linux specific port
 dev = LoadstarSensorsInterface(port='/dev/tty.usbmodem262471') # Mac OS X specific port
@@ -176,15 +176,6 @@ dev.set_averaging_window(5) # 1-1024 samples
 dev.get_averaging_window()
 dev.set_averaging_threshold(25) # 1-100 percent
 dev.get_averaging_threshold()
-
-dev.set_scale_factor(ScaleFactor.LB_TO_GM)
-dev.get_scale_factor()
-
-dev.set_scale_factor('LB_TO_GM') # ScaleFactor string
-dev.get_scale_factor()
-
-dev.set_scale_factor(25.4) # float e.g. in to mm
-dev.get_scale_factor()
 #+END_SRC
 
 ** Command Line
@@ -317,13 +308,13 @@ cd <<repository-name>>
 ** Edit .metadata.org
 
 #+BEGIN_SRC sh :noweb yes
-make edits
+make metadata-edits
 #+END_SRC
 
 ** Tangle .metadata.org
 
 #+BEGIN_SRC sh :noweb yes
-make files
+make metadata
 #+END_SRC
 
 ** Test Python package using ipython shell
@@ -496,7 +487,7 @@ python-dev-package
 # This file is generated automatically from .metadata.org
 # File edits may be overwritten!
 
-upload: files package twine add clean
+upload: metadata package twine add clean
 
 dev-shell:
 	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm
@@ -510,10 +501,10 @@ serial-shell:
 installed-shell:
 	guix time-machine -C .channels.scm -- shell --container -f .guix.scm --rebuild-cache
 
-edits:
+metadata-edits:
 	guix time-machine -C .channels.scm -- shell --container --preserve='^DISPLAY$$' --preserve='^TERM$$' -D -f .guix.scm -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l .init.el --file .metadata.org"
 
-files:
+metadata:
 	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "emacs --batch -Q  -l .init.el --eval '(process-org \".metadata.org\")'"
 
 package:
@@ -637,5 +628,5 @@ from loadstar_sensors_interface.__about__ import (
     __url__,
     __version__)
 
-from .loadstar_sensors_interface import LoadstarSensorsInterface, ScaleFactor
+from .loadstar_sensors_interface import LoadstarSensorsInterface
 #+END_SRC

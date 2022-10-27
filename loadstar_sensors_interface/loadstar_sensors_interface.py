@@ -9,16 +9,6 @@ from serial_interface import SerialInterface, ReadError
 DEBUG = False
 
 
-class ScaleFactor(Enum):
-    """Common scale factors to convert units."""
-
-    ONE = 1.0
-    LB_TO_GM = 453.59237
-    LB_TO_KG = 0.45359237
-    LB_TO_N = 4.44822
-    LB_TO_OZ = 16
-
-
 class LoadstarSensorsInterface():
     """Loadstar Sensors USB device."""
 
@@ -60,8 +50,6 @@ class LoadstarSensorsInterface():
                        'rtscts': False,
                        'dsrdtr': False
                        })
-        self._scale_factor = 1.0
-        self._scale_factor_name = 'ONE'
         self._serial_interface = SerialInterface(*args, **kwargs)
 
     def get_device_info(self):
@@ -71,8 +59,6 @@ class LoadstarSensorsInterface():
         device_info['model'] = self.get_model()
         device_info['id'] = self.get_id()
         device_info['native_units'] = self.get_native_units()
-        device_info['scale_factor'] = self.get_scale_factor()
-        device_info['scale_factor_name'] = self.get_scale_factor_name()
         device_info['load_capacity'] = self.get_load_capacity()
         device_info['averaging_window'] = self.get_averaging_window()
         device_info['averaging_threshold'] = self.get_averaging_threshold()
@@ -99,11 +85,11 @@ class LoadstarSensorsInterface():
         return False
 
     def get_sensor_value(self):
-        """Sensor value after multiplying by scale factor."""
+        """Sensor value."""
         for x in range(self._READ_ATTEMPTS):
             try:
                 response = self._send_request_get_response('w')
-                sensor_value = float(response) * self._scale_factor
+                sensor_value = float(response)
                 return sensor_value
             except ValueError:
                 self._debug_print('ValueError')
@@ -127,36 +113,15 @@ class LoadstarSensorsInterface():
         return response
 
     def get_native_units(self):
-        """Units before sensor value is multiplied by scale factor."""
+        """Sensor value units."""
         response = self._send_request_get_response('unit')
         response = response.decode()
         return response
 
-    def get_scale_factor(self):
-        """Float that gets multiplied to the sensor value."""
-        return self._scale_factor
-
-    def get_scale_factor_name(self):
-        """Name of the scale factor, if any."""
-        return self._scale_factor_name
-
-    def set_scale_factor(self, scale_factor):
-        """Float that gets multiplied to the sensor value."""
-        if isinstance(scale_factor, ScaleFactor):
-            self._scale_factor = scale_factor.value
-            self._scale_factor_name = scale_factor.name
-            return
-        try:
-            self._scale_factor = ScaleFactor[scale_factor].value
-            self._scale_factor_name = ScaleFactor[scale_factor].name
-        except KeyError:
-            self._scale_factor = float(scale_factor)
-            self._scale_factor_name = None
-
     def get_load_capacity(self):
-        """Maximum sensor value in native units multiplied by scale factor."""
+        """Maximum sensor value in native units."""
         response = self._send_request_get_response('lc')
-        load_capacity = float(response) * self._scale_factor
+        load_capacity = float(response)
         return load_capacity
 
     def get_averaging_window(self):

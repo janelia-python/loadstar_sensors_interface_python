@@ -4,7 +4,7 @@ import time
 from threading import Timer
 import os
 
-from .loadstar_sensors_interface import LoadstarSensorsInterface, ScaleFactor
+from .loadstar_sensors_interface import LoadstarSensorsInterface
 
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
@@ -23,12 +23,6 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               is_flag=True,
               default=False,
               help='Tare before getting sensor values.')
-@click.option('-s', '--scale-factor',
-              type=click.Choice(list([sf.name for sf in ScaleFactor]),
-                                case_sensitive=False),
-              default=ScaleFactor.ONE.name,
-              show_default=True,
-              help='Scale output values (e.g. to convert units)')
 @click.option('-w', '--window',
               default=1,
               show_default=True,
@@ -48,14 +42,12 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 def main(port,
          info,
          tare,
-         scale_factor,
          window,
          threshold,
          frequency,
          duration):
     """Console script entry point."""
     dev = LoadstarSensorsInterface(port=port)
-    dev.set_scale_factor(scale_factor)
     dev.set_averaging_window(window)
     dev.set_averaging_threshold(threshold)
 
