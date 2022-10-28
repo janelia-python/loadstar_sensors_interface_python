@@ -3,32 +3,38 @@
 
 upload: metadata package twine add clean
 
+GUIX-SHELL = guix time-machine -C .channels.scm -- shell
+GUIX-CONTAINER = $(GUIX-SHELL) --container
+PORT = /dev/ttyUSB0
+EXPOSED-GUIX-CONTAINER = $(GUIX-CONTAINER) --expose=$(PORT)
+DEVELOPMENT = -D -f .guix.scm
+
 dev-shell:
-	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm
+	$(EXPOSED-GUIX-CONTAINER) $(DEVELOPMENT)
 
 ipython-shell:
-	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- ipython
+	$(EXPOSED-GUIX-CONTAINER) $(DEVELOPMENT) -- ipython
 
 serial-shell:
-	guix shell picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c /dev/ttyUSB0
+	$(EXPOSED-GUIX-CONTAINER) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
 
 installed-shell:
-	guix time-machine -C .channels.scm -- shell --container -f .guix.scm --rebuild-cache
+	$(EXPOSED-GUIX-CONTAINER) -f .guix.scm --rebuild-cache
 
 metadata-edits:
-	guix time-machine -C .channels.scm -- shell --container --preserve='^DISPLAY$$' --preserve='^TERM$$' -D -f .guix.scm -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l .init.el --file .metadata.org"
+	$(GUIX-CONTAINER) --preserve='^DISPLAY$$' --preserve='^TERM$$' $(DEVELOPMENT) -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l .init.el --file .metadata.org"
 
 metadata:
-	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "emacs --batch -Q  -l .init.el --eval '(process-org \".metadata.org\")'"
+	$(GUIX-CONTAINER) $(DEVELOPMENT) -- sh -c "emacs --batch -Q  -l .init.el --eval '(process-org \".metadata.org\")'"
 
 package:
-	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "python3 setup.py sdist bdist_wheel"
+	$(GUIX-CONTAINER) $(DEVELOPMENT) -- sh -c "python3 setup.py sdist bdist_wheel"
 
 twine:
-	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "twine upload dist/*"
+	$(GUIX-CONTAINER) $(DEVELOPMENT) -- sh -c "twine upload dist/*"
 
 add:
-	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "git add --all"
+	$(GUIX-CONTAINER) $(DEVELOPMENT) -- sh -c "git add --all"
 
 clean:
-	guix time-machine -C .channels.scm -- shell --container -D -f .guix.scm -- sh -c "git clean -xdf"
+	$(GUIX-CONTAINER) $(DEVELOPMENT) -- sh -c "git clean -xdf"

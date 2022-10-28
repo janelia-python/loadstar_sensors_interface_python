@@ -1,7 +1,6 @@
 """Python interface to Loadstar Sensors USB devices."""
 import time
 import serial
-from enum import Enum
 
 from serial_interface import SerialInterface, ReadError
 
@@ -96,6 +95,18 @@ class LoadstarSensorsInterface():
                 self._sleep()
         return None
 
+    def get_adc_value(self):
+        """ADC value."""
+        for x in range(self._READ_ATTEMPTS):
+            try:
+                response = self._send_request_get_response('r')
+                sensor_value = float(response)
+                return sensor_value
+            except ValueError:
+                self._debug_print('ValueError')
+                self._sleep()
+        return None
+
     def get_port(self):
         """Sensor device name."""
         return self._serial_interface.port
@@ -179,10 +190,11 @@ class LoadstarSensorsInterface():
                 self._debug_print(request)
                 self._serial_interface.reset_input_buffer()
                 self._serial_interface.reset_output_buffer()
-                response = self._serial_interface.write_read(request + self._REQUEST_EOL,
-                                                             use_readline=use_readline,
-                                                             check_write_freq=True,
-                                                             max_read_attempts=1000)
+                response = self._serial_interface.write_read(
+                    request + self._REQUEST_EOL,
+                    use_readline=use_readline,
+                    check_write_freq=True,
+                    max_read_attempts=1000)
                 self._debug_print(response)
                 if response and not response.strip() == b'':
                     return response.strip()

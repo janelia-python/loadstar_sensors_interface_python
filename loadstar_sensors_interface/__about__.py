@@ -1,5 +1,7 @@
+"""Python interface to Loadstar Sensors USB devices."""
 # This file is generated automatically from .metadata.org
 # File edits may be overwritten!
+
 __version__ = '0.9.0'
 __description__ = 'Python interface to Loadstar Sensors USB devices.'
 __license__ = 'BSD-3-Clause'

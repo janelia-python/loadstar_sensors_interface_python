@@ -1,7 +1,4 @@
-'''
-Python interface to Loadstar Sensors USB devices.
-'''
-
+"""Python interface to Loadstar Sensors USB devices."""
 # This file is generated automatically from .metadata.org
 # File edits may be overwritten!
 from loadstar_sensors_interface.__about__ import (
