@@ -95,6 +95,32 @@ class LoadstarSensorsInterface():
                 self._sleep()
         return None
 
+    # 4 seconds seems max
+    def get_sensor_values(self, duration):
+        """Sensor value."""
+        for x in range(self._READ_ATTEMPTS):
+            try:
+                self._serial_interface.write(b'wc\r')
+                time.sleep(duration)
+                self._serial_interface.write(b'\r')
+                full_response = b''
+                while True:
+                    response = self._serial_interface.read()
+                    if len(response) == 0:
+                        break
+                    full_response += response
+                sensor_values = full_response.split(b'\r\n')
+                sensor_value_count = len(sensor_values)
+                # print(f'sensor_value_count = {sensor_value_count}')
+                sensor_values_per_second = sensor_value_count / duration
+                # print(f'sensor_values_per_second = {sensor_values_per_second}')
+                sensor_values = [float(x) for x in sensor_values if len(x) > 0]
+                return sensor_values
+            except ValueError:
+                self._debug_print('ValueError')
+                self._sleep()
+        return None
+
     def get_adc_value(self):
         """ADC value."""
         for x in range(self._READ_ATTEMPTS):
