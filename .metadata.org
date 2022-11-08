@@ -56,19 +56,24 @@ LICENSE
 loadstar_sensors_interface_python
 #+END_SRC
 
-#+NAME: guix-name
+#+NAME: repository-organization
 #+BEGIN_SRC text :exports none :noweb yes
-python-loadstar-sensors-interface
+janelia-pypi
 #+END_SRC
 
 #+NAME: repository-url
 #+BEGIN_SRC text :exports none :noweb yes
-https://github.com/janelia-pypi/<<repository-name>>
+https://github.com/<<repository-organization>>/<<repository-name>>
 #+END_SRC
 
 #+NAME: code-repository
 #+BEGIN_SRC text :exports none :noweb yes
 git+<<repository-url>>.git
+#+END_SRC
+
+#+NAME: guix-name
+#+BEGIN_SRC text :exports none :noweb yes
+python-loadstar-sensors-interface
 #+END_SRC
 
 #+NAME: author-given-name

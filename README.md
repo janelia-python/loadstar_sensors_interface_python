@@ -16,7 +16,9 @@
 - Author: Peter Polidoro
 - Email: peter@polidoro.io
 - Copyright: 2022 Howard Hughes Medical Institute
-- Reference: https://www.loadstarsensors.com/
+- References:
+  - https://www.loadstarsensors.com/
+  - https://www.loadstarsensors.com/di-100u-di-1000u-command-set.html
 - Dependencies:
   - serial_interface
   - click
@@ -38,6 +40,7 @@ dev = LoadstarSensorsInterface(port='COM3') # Windows specific port
 dev.get_device_info()
 dev.tare()
 dev.get_sensor_value()
+dev.get_sensor_values(4)
 
 dev.get_port()
 dev.get_model()
@@ -197,7 +200,8 @@ make metadata
 ## Test Python package using ipython shell
 
 ```sh
-make ipython-shell
+make ipython-shell # PORT=/dev/ttyUSB0
+# make PORT=/dev/ttyUSB1 ipython-shell
 import loadstar_sensors_interface
 exit
 ```
@@ -206,7 +210,8 @@ exit
 ## Test installation of Guix package
 
 ```sh
-make installed-shell
+make installed-shell # PORT=/dev/ttyUSB0
+# make PORT=/dev/ttyUSB1 installed-shell
 exit
 ```
 
@@ -221,7 +226,8 @@ make upload
 ## Test direct device interaction using serial terminal
 
 ```sh
-make serial-shell
+make serial-shell # PORT=/dev/ttyUSB0
+# make PORT=/dev/ttyUSB1 serial-shell
 ? # help
 settings
 [C-a][C-x] # to exit
