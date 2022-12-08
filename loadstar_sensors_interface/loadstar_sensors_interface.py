@@ -96,7 +96,7 @@ class LoadstarSensorsInterface():
         return None
 
     # 4 seconds seems max
-    def get_sensor_values(self, duration):
+    def get_sensor_values_for_duration(self, duration):
         """Sensor value."""
         for x in range(self._READ_ATTEMPTS):
             try:
@@ -161,13 +161,13 @@ class LoadstarSensorsInterface():
         load_capacity = float(response)
         return load_capacity
 
-    def get_averaging_window(self):
+    def get_averaging_window_in_samples(self):
         """Count of samples to average (1-1024 samples)."""
         response = self._send_request_get_response('css')
         averaging_window = int(response)
         return averaging_window
 
-    def set_averaging_window(self, averaging_window):
+    def set_averaging_window_in_samples(self, averaging_window):
         """Count of samples to average (1-1024 samples)."""
         averaging_window = int(averaging_window)
         if averaging_window < self._AVERAGING_WINDOW_MIN:
@@ -176,7 +176,7 @@ class LoadstarSensorsInterface():
             averaging_window = self._AVERAGING_WINDOW_MAX
         self._send_request_get_response('css ' + str(averaging_window))
 
-    def get_averaging_threshold(self):
+    def get_averaging_threshold_in_percent(self):
         """Percentage of capacity below which average is performed (1-100%)."""
         response = self._send_request_get_response('cla')
         # e.g. b'00000\t( 2.1999995e-01)'
@@ -185,7 +185,7 @@ class LoadstarSensorsInterface():
         averaging_threshold = int(averaging_threshold)
         return averaging_threshold
 
-    def set_averaging_threshold(self, averaging_threshold):
+    def set_averaging_threshold_in_percent(self, averaging_threshold):
         """Percentage of capacity below which average is performed (1-100%)."""
         averaging_threshold = int(averaging_threshold)
         if averaging_threshold < self._AVERAGING_THRESHOLD_MIN:

@@ -1,16 +1,22 @@
-<!---
-    This file is generated automatically from .metadata.org
-    File edits may be overwritten!
-    --->
+- [About](#orgdd7620f)
+- [Example Usage](#org2799596)
+- [Installation](#orgd89688b)
+- [Development](#org3d72690)
 
+    <!-- This file is generated automatically from .metadata.org -->
+    <!-- File edits may be overwritten! -->
+
+
+<a id="orgdd7620f"></a>
 
 # About
 
 ```markdown
 - Name: loadstar_sensors_interface
 - Description: Python interface to Loadstar Sensors USB devices.
-- Version: 0.9.0
-- Date: 2022-10-26
+- Version: 0.10.0
+- Release Date: 2022-12-08
+- Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
 - Author: Peter Polidoro
@@ -25,6 +31,8 @@
 ```
 
 
+<a id="org2799596"></a>
+
 # Example Usage
 
 
@@ -37,20 +45,15 @@ dev = LoadstarSensorsInterface(port='/dev/ttyUSB0') # GNU/Linux specific port
 dev = LoadstarSensorsInterface(port='/dev/tty.usbmodem262471') # Mac OS X specific port
 dev = LoadstarSensorsInterface(port='COM3') # Windows specific port
 
-dev.get_device_info()
+device_info = dev.get_device_info()
 dev.tare()
-dev.get_sensor_value()
-dev.get_sensor_values(4)
+sensor_value = dev.get_sensor_value()
+sensor_values = dev.get_sensor_values_for_duration(4)
 
-dev.get_port()
-dev.get_model()
-dev.get_id()
-dev.get_native_units()
-dev.get_load_capacity()
-dev.set_averaging_window(5) # 1-1024 samples
-dev.get_averaging_window()
-dev.set_averaging_threshold(25) # 1-100 percent
-dev.get_averaging_threshold()
+dev.set_averaging_window_in_samples(5) # 1-1024 samples
+averaging_window = dev.get_averaging_window_in_samples()
+dev.set_averaging_threshold_in_percent(25) # 1-100 percent
+averaging_threshold = dev.get_averaging_threshold_in_percent()
 ```
 
 
@@ -72,6 +75,8 @@ loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
 
 ```
 
+
+<a id="orgd89688b"></a>
 
 # Installation
 
@@ -166,6 +171,8 @@ The Python code in this library may be installed in any number of ways, chose on
     pip install loadstar_sensors_interface
     ```
 
+
+<a id="org3d72690"></a>
 
 # Development
 
