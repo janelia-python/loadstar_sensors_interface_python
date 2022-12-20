@@ -192,21 +192,21 @@ averaging_threshold = dev.get_averaging_threshold_in_percent()
 
 ** Command Line
 
-#+BEGIN_SRC sh
-loadstar --help
-# Usage: loadstar [OPTIONS]
+#+BEGIN_SRC sh :noweb yes
+<<command-line-interface>> --help
+# Usage: <<command-line-interface>> [OPTIONS]
 
 #+END_SRC
 
 #+RESULTS:
 
-#+BEGIN_SRC sh
-loadstar --info
+#+BEGIN_SRC sh :noweb yes
+<<command-line-interface>> --info
 
 #+END_SRC
 
-#+BEGIN_SRC sh
-loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
+#+BEGIN_SRC sh :noweb yes
+<<command-line-interface>> -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
 
 #+END_SRC
 
@@ -634,7 +634,7 @@ __copyright__ = '<<copyright>>'
 """<<description>>"""
 # This file is generated automatically from .metadata.org
 # File edits may be overwritten!
-from loadstar_sensors_interface.__about__ import (
+from <<name>>.__about__ import (
     __author__,
     __copyright__,
     __email__,
@@ -643,7 +643,7 @@ from loadstar_sensors_interface.__about__ import (
     __url__,
     __version__)
 
-from .loadstar_sensors_interface import LoadstarSensorsInterface
+from .<<name>> import LoadstarSensorsInterface
 #+END_SRC
 
 #+BEGIN_SRC text :tangle LICENSE :exports none :noweb yes
