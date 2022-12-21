@@ -7,7 +7,7 @@ upload: metadata package twine add clean
 GUIX-SHELL = guix time-machine -C .channels.scm -- shell
 GUIX-CONTAINER = $(GUIX-SHELL) --container
 PORT = /dev/ttyUSB0
-GUIX-CONTAINER-EXPOSED = $(GUIX-CONTAINER) --expose=$(PORT)
+GUIX-CONTAINER-PORT = $(GUIX-CONTAINER) --expose=$(PORT)
 DEVELOPMENT = -D -f .guix.scm
 GUIX-CONTAINER-DEVELOPMENT = $(GUIX-CONTAINER) $(DEVELOPMENT)
 GUIX-CONTAINER-GUI = $(GUIXCONTAINER-DEVELOPMENT) --preserve='^DISPLAY$$' --preserve='^TERM$$'
@@ -22,23 +22,23 @@ container:
 
 .PHONY: exposed-container
 exposed-container:
-	$(GUIX-CONTAINER-EXPOSED)
+	$(GUIX-CONTAINER-PORT)
 
 .PHONY: dev-container
 dev-container:
-	$(GUIX-CONTAINER-EXPOSED) $(DEVELOPMENT)
+	$(GUIX-CONTAINER-PORT) $(DEVELOPMENT)
 
 .PHONY: ipython-shell
 ipython-shell:
-	$(GUIX-CONTAINER-EXPOSED) $(DEVELOPMENT) -- ipython
+	$(GUIX-CONTAINER-PORT) $(DEVELOPMENT) -- ipython
 
 .PHONY: serial-shell
 serial-shell:
-	$(GUIX-CONTAINER-EXPOSED) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
+	$(GUIX-CONTAINER-PORT) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
 
 .PHONY: installed-shell
 installed-shell:
-	$(GUIX-CONTAINER-EXPOSED) -f .guix.scm --rebuild-cache
+	$(GUIX-CONTAINER-PORT) -f .guix.scm --rebuild-cache
 
 .PHONY: metadata-edits
 metadata-edits:
@@ -54,7 +54,7 @@ package:
 
 .PHONY: twine
 twine:
-	$(GUIX-CONTAINER-DEVELOPMENT) -- sh -c "twine upload dist/*"
+	$(GUIX-CONTAINER-DEVELOPMENT) --network --expose=$$HOME/.pypirc -- sh -c "twine upload dist/*"
 
 .PHONY: add
 add:
