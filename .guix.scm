@@ -12,9 +12,7 @@
  (gnu packages python-build)
  (gnu packages python-xyz)
  (gnu packages version-control)
- (gnu packages ncurses)
- (guix-janelia packages python-janelia)
- (guix-janelia packages python-xyz))
+ (gnu packages ncurses))
 
 (define %source-dir (dirname (current-filename)))
 
@@ -36,7 +34,7 @@
                          python-ipython))
     (propagated-inputs (list
                         ncurses
-                        python-serial-interface
+                        python-pyserial
                         python-click))
     (home-page "")
     (synopsis "")

@@ -36,13 +36,13 @@ Python interface to Loadstar Sensors USB devices.
 
 #+NAME: python-dependencies
 #+BEGIN_SRC text :exports none :noweb yes
-serial_interface
+pyserial
 click
 #+END_SRC
 
 #+NAME: guix-dependencies
 #+BEGIN_SRC text :exports none :noweb yes
-python-serial-interface
+python-pyserial
 python-click
 #+END_SRC
 
@@ -174,7 +174,6 @@ Python 3
 
 #+BEGIN_SRC python
 from loadstar_sensors_interface import LoadstarSensorsInterface
-dev = LoadstarSensorsInterface() # Try to automatically detect port
 dev = LoadstarSensorsInterface(port='/dev/ttyUSB0') # GNU/Linux specific port
 dev = LoadstarSensorsInterface(port='/dev/tty.usbmodem262471') # Mac OS X specific port
 dev = LoadstarSensorsInterface(port='COM3') # Windows specific port
@@ -405,18 +404,12 @@ settings
         (url "https://git.savannah.gnu.org/git/guix.git")
         (branch "master")
         (commit
-          "234190df00ae8032db38c7a4e2c82d7d8f364990")
+          "c1d543203e6de2ca31da82097f23b31a4250315e")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"
             (openpgp-fingerprint
-              "BBB0 2DDF 2CEA F6A8 0D1D  E643 A2A0 6DF2 A33A 54FA"))))
-      (channel
-        (name 'guix-janelia)
-        (url "https://github.com/guix-janelia/guix-janelia.git")
-        (branch "main")
-        (commit
-          "a082913f2dcfd0aa7d1922e780880505aaf3e2d9")))
+              "BBB0 2DDF 2CEA F6A8 0D1D  E643 A2A0 6DF2 A33A 54FA")))))
 #+END_SRC
 
 #+BEGIN_SRC scheme :tangle .guix.scm :exports none :noweb yes
@@ -434,9 +427,7 @@ settings
  (gnu packages python-build)
  (gnu packages python-xyz)
  (gnu packages version-control)
- (gnu packages ncurses)
- (guix-janelia packages python-janelia)
- (guix-janelia packages python-xyz))
+ (gnu packages ncurses))
 
 (define %source-dir (dirname (current-filename)))
 

@@ -1,13 +1,13 @@
-- [About](#orgd92caaf)
-- [Example Usage](#orgfbd25b2)
-- [Installation](#org5ed13dc)
-- [Development](#orgccec6f2)
+- [About](#org3595acd)
+- [Example Usage](#orgd6c4c0e)
+- [Installation](#orgf4d7d1a)
+- [Development](#orgcf5111b)
 
     <!-- This file is generated automatically from .metadata.org -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="orgd92caaf"></a>
+<a id="org3595acd"></a>
 
 # About
 
@@ -15,7 +15,7 @@
 - Name: loadstar_sensors_interface
 - Description: Python interface to Loadstar Sensors USB devices.
 - Version: 0.10.0
-- Release Date: 2022-12-20
+- Release Date: 2022-12-22
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -26,12 +26,12 @@
   - https://www.loadstarsensors.com/
   - https://www.loadstarsensors.com/di-100u-di-1000u-command-set.html
 - Dependencies:
-  - serial_interface
+  - pyserial
   - click
 ```
 
 
-<a id="orgfbd25b2"></a>
+<a id="orgd6c4c0e"></a>
 
 # Example Usage
 
@@ -40,7 +40,6 @@
 
 ```python
 from loadstar_sensors_interface import LoadstarSensorsInterface
-dev = LoadstarSensorsInterface() # Try to automatically detect port
 dev = LoadstarSensorsInterface(port='/dev/ttyUSB0') # GNU/Linux specific port
 dev = LoadstarSensorsInterface(port='/dev/tty.usbmodem262471') # Mac OS X specific port
 dev = LoadstarSensorsInterface(port='COM3') # Windows specific port
@@ -76,7 +75,7 @@ loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
 ```
 
 
-<a id="org5ed13dc"></a>
+<a id="orgf4d7d1a"></a>
 
 # Installation
 
@@ -172,7 +171,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="orgccec6f2"></a>
+<a id="orgcf5111b"></a>
 
 # Development
 
