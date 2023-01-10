@@ -1,13 +1,13 @@
-- [About](#orgd92caaf)
-- [Example Usage](#orgfbd25b2)
-- [Installation](#org5ed13dc)
-- [Development](#orgccec6f2)
+- [About](#org7564bbd)
+- [Example Usage](#org343144a)
+- [Installation](#orgb5b473c)
+- [Development](#orgd439063)
 
-    <!-- This file is generated automatically from .metadata.org -->
+    <!-- This file is generated automatically from metadata.org -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="orgd92caaf"></a>
+<a id="org7564bbd"></a>
 
 # About
 
@@ -15,13 +15,13 @@
 - Name: loadstar_sensors_interface
 - Description: Python interface to Loadstar Sensors USB devices.
 - Version: 0.10.0
-- Release Date: 2022-12-20
+- Release Date: 2023-01-10
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
 - Author: Peter Polidoro
 - Email: peter@polidoro.io
-- Copyright: 2022 Howard Hughes Medical Institute
+- Copyright: 2023 Howard Hughes Medical Institute
 - References:
   - https://www.loadstarsensors.com/
   - https://www.loadstarsensors.com/di-100u-di-1000u-command-set.html
@@ -31,7 +31,7 @@
 ```
 
 
-<a id="orgfbd25b2"></a>
+<a id="org343144a"></a>
 
 # Example Usage
 
@@ -76,7 +76,7 @@ loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
 ```
 
 
-<a id="org5ed13dc"></a>
+<a id="orgb5b473c"></a>
 
 # Installation
 
@@ -172,7 +172,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="orgccec6f2"></a>
+<a id="orgd439063"></a>
 
 # Development
 
@@ -190,14 +190,14 @@ cd loadstar_sensors_interface_python
 ```
 
 
-## Edit .metadata.org
+## Edit metadata.org
 
 ```sh
 make metadata-edits
 ```
 
 
-## Tangle .metadata.org
+## Tangle metadata.org
 
 ```sh
 make metadata

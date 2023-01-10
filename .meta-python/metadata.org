@@ -1,9 +1,9 @@
-#+EXPORT_FILE_NAME: README.md
+#+EXPORT_FILE_NAME: ../README.md
 #+OPTIONS: toc:1 |:t ^:nil tags:nil
 
 # Place warning at the top of the exported file
 #+BEGIN_EXAMPLE
-<!-- This file is generated automatically from .metadata.org -->
+<!-- This file is generated automatically from metadata.org -->
 <!-- File edits may be overwritten! -->
 #+END_EXAMPLE
 
@@ -317,13 +317,13 @@ git clone <<repository-url>>
 cd <<repository-name>>
 #+END_SRC
 
-** Edit .metadata.org
+** Edit metadata.org
 
 #+BEGIN_SRC sh :noweb yes
 make metadata-edits
 #+END_SRC
 
-** Tangle .metadata.org
+** Tangle metadata.org
 
 #+BEGIN_SRC sh :noweb yes
 make metadata
@@ -364,11 +364,11 @@ settings
 
 * Tangled Files                                                    :noexport:
 
-#+BEGIN_SRC text :tangle AUTHORS :exports none :noweb yes
+#+BEGIN_SRC text :tangle ../AUTHORS :exports none :noweb yes
 <<author>>
 #+END_SRC
 
-#+BEGIN_SRC js :tangle codemeta.json :exports none :noweb yes
+#+BEGIN_SRC js :tangle ../codemeta.json :exports none :noweb yes
 {
     "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
     "@type": "SoftwareSourceCode",
@@ -397,8 +397,8 @@ settings
 }
 #+END_SRC
 
-#+BEGIN_SRC scheme :tangle .channels.scm :exports none :noweb yes
-;; This file is generated automatically from .metadata.org
+#+BEGIN_SRC scheme :tangle guix/channels.scm :exports none :noweb yes
+;; This file is generated automatically from metadata.org
 ;; File edits may be overwritten!
 (list (channel
         (name 'guix)
@@ -419,8 +419,8 @@ settings
           "a082913f2dcfd0aa7d1922e780880505aaf3e2d9")))
 #+END_SRC
 
-#+BEGIN_SRC scheme :tangle .guix.scm :exports none :noweb yes
-;; This file is generated automatically from .metadata.org
+#+BEGIN_SRC scheme :tangle guix/guix.scm :exports none :noweb yes
+;; This file is generated automatically from metadata.org
 ;; File edits may be overwritten!
 (use-modules
  (guix packages)
@@ -468,17 +468,17 @@ python-dev-package
 #+END_SRC
 
 #+BEGIN_SRC text :tangle Makefile :exports none :noweb yes
-# This file is generated automatically from .metadata.org
+# This file is generated automatically from metadata.org
 # File edits may be overwritten!
 
 .PHONY: upload
 upload: metadata package twine add clean
 
-GUIX-SHELL = guix time-machine -C .channels.scm -- shell
+GUIX-SHELL = guix time-machine -C guix/channels.scm -- shell
 GUIX-CONTAINER = $(GUIX-SHELL) --container
 PORT = /dev/ttyUSB0
 GUIX-CONTAINER-PORT = $(GUIX-CONTAINER) --expose=$(PORT)
-DEVELOPMENT = -D -f .guix.scm
+DEVELOPMENT = -D -f guix/guix.scm
 GUIX-CONTAINER-DEVELOPMENT = $(GUIX-CONTAINER) $(DEVELOPMENT)
 GUIX-CONTAINER-GUI = $(GUIXCONTAINER-DEVELOPMENT) --preserve='^DISPLAY$$' --preserve='^TERM$$'
 
@@ -508,15 +508,15 @@ serial-shell:
 
 .PHONY: installed-shell
 installed-shell:
-	$(GUIX-CONTAINER-PORT) -f .guix.scm --rebuild-cache
+	$(GUIX-CONTAINER-PORT) -f guix/guix.scm --rebuild-cache
 
 .PHONY: metadata-edits
 metadata-edits:
-	$(GUIX-CONTAINER-GUI) -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l .init.el --file .metadata.org"
+	$(GUIX-CONTAINER-GUI) -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l emacs/init.el --file metadata.org"
 
 .PHONY: metadata
 metadata:
-	$(GUIX-CONTAINER-DEVELOPMENT) -- sh -c "emacs --batch -Q  -l .init.el --eval '(process-org \".metadata.org\")'"
+	$(GUIX-CONTAINER-DEVELOPMENT) -- sh -c "emacs --batch -Q  -l emacs/init.el --eval '(process-org \"metadata.org\")'"
 
 .PHONY: package
 package:
@@ -535,8 +535,8 @@ clean:
 	$(GUIX-CONTAINER-DEVELOPMENT) -- sh -c "git clean -xdf"
 #+END_SRC
 
-#+BEGIN_SRC scheme :tangle .init.el :exports none :noweb yes
-;; This file is generated automatically from .metadata.org
+#+BEGIN_SRC scheme :tangle emacs/init.el :exports none :noweb yes
+;; This file is generated automatically from metadata.org
 ;; File edits may be overwritten!
 (require 'org)
 
@@ -570,16 +570,16 @@ clean:
 
 #+END_SRC
 
-#+BEGIN_SRC text :tangle pyproject.toml :exports none :noweb yes
-# This file is generated automatically from .metadata.org
+#+BEGIN_SRC text :tangle ../pyproject.toml :exports none :noweb yes
+# This file is generated automatically from metadata.org
 # File edits may be overwritten!
 [build-system]
 requires = ["setuptools"]
 build-backed = "setuptools.build_meta"
 #+END_SRC
 
-#+BEGIN_SRC text :tangle setup.cfg :exports none :noweb yes
-# This file is generated automatically from .metadata.org
+#+BEGIN_SRC text :tangle ../setup.cfg :exports none :noweb yes
+# This file is generated automatically from metadata.org
 # File edits may be overwritten!
 [metadata]
 name = <<name>>
@@ -605,9 +605,9 @@ console_scripts =
     <<command-line-interface>> = <<name>>.cli:main
 #+END_SRC
 
-#+BEGIN_SRC python :tangle setup.py :exports none :noweb yes
+#+BEGIN_SRC python :tangle ../setup.py :exports none :noweb yes
 """<<description>>"""
-# This file is generated automatically from .metadata.org
+# This file is generated automatically from metadata.org
 # File edits may be overwritten!
 from setuptools import setup
 
@@ -616,9 +616,9 @@ if __name__ == '__main__':
     setup()
 #+END_SRC
 
-#+BEGIN_SRC python :tangle loadstar_sensors_interface/__about__.py :exports none :noweb yes
+#+BEGIN_SRC python :tangle ../loadstar_sensors_interface/__about__.py :exports none :noweb yes
 """<<description>>"""
-# This file is generated automatically from .metadata.org
+# This file is generated automatically from metadata.org
 # File edits may be overwritten!
 
 __version__ = '<<version>>'
@@ -630,9 +630,9 @@ __email__ = '<<email>>'
 __copyright__ = '<<copyright>>'
 #+END_SRC
 
-#+BEGIN_SRC python :tangle loadstar_sensors_interface/__init__.py :exports none :noweb yes
+#+BEGIN_SRC python :tangle ../loadstar_sensors_interface/__init__.py :exports none :noweb yes
 """<<description>>"""
-# This file is generated automatically from .metadata.org
+# This file is generated automatically from metadata.org
 # File edits may be overwritten!
 from <<name>>.__about__ import (
     __author__,
@@ -646,7 +646,7 @@ from <<name>>.__about__ import (
 from .<<name>> import LoadstarSensorsInterface
 #+END_SRC
 
-#+BEGIN_SRC text :tangle LICENSE :exports none :noweb yes
+#+BEGIN_SRC text :tangle ../LICENSE :exports none :noweb yes
 Janelia Open-Source Software (3-clause BSD License)
 
 Copyright <<copyright>>

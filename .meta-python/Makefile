@@ -1,14 +1,14 @@
-# This file is generated automatically from .metadata.org
+# This file is generated automatically from metadata.org
 # File edits may be overwritten!
 
 .PHONY: upload
 upload: metadata package twine add clean
 
-GUIX-SHELL = guix time-machine -C .channels.scm -- shell
+GUIX-SHELL = guix time-machine -C guix/channels.scm -- shell
 GUIX-CONTAINER = $(GUIX-SHELL) --container
 PORT = /dev/ttyUSB0
 GUIX-CONTAINER-PORT = $(GUIX-CONTAINER) --expose=$(PORT)
-DEVELOPMENT = -D -f .guix.scm
+DEVELOPMENT = -D -f guix/guix.scm
 GUIX-CONTAINER-DEVELOPMENT = $(GUIX-CONTAINER) $(DEVELOPMENT)
 GUIX-CONTAINER-GUI = $(GUIXCONTAINER-DEVELOPMENT) --preserve='^DISPLAY$$' --preserve='^TERM$$'
 
@@ -38,15 +38,15 @@ serial-shell:
 
 .PHONY: installed-shell
 installed-shell:
-	$(GUIX-CONTAINER-PORT) -f .guix.scm --rebuild-cache
+	$(GUIX-CONTAINER-PORT) -f guix/guix.scm --rebuild-cache
 
 .PHONY: metadata-edits
 metadata-edits:
-	$(GUIX-CONTAINER-GUI) -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l .init.el --file .metadata.org"
+	$(GUIX-CONTAINER-GUI) -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l emacs/init.el --file metadata.org"
 
 .PHONY: metadata
 metadata:
-	$(GUIX-CONTAINER-DEVELOPMENT) -- sh -c "emacs --batch -Q  -l .init.el --eval '(process-org \".metadata.org\")'"
+	$(GUIX-CONTAINER-DEVELOPMENT) -- sh -c "emacs --batch -Q  -l emacs/init.el --eval '(process-org \"metadata.org\")'"
 
 .PHONY: package
 package:
