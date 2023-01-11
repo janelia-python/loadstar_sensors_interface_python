@@ -1,13 +1,13 @@
-- [About](#org7564bbd)
-- [Example Usage](#org343144a)
-- [Installation](#orgb5b473c)
-- [Development](#orgd439063)
+- [About](#org6051c89)
+- [Example Usage](#orgaa9f5cd)
+- [Installation](#org9a00832)
+- [Development](#org52429d5)
 
     <!-- This file is generated automatically from metadata.org -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="org7564bbd"></a>
+<a id="org6051c89"></a>
 
 # About
 
@@ -15,7 +15,7 @@
 - Name: loadstar_sensors_interface
 - Description: Python interface to Loadstar Sensors USB devices.
 - Version: 0.10.0
-- Release Date: 2023-01-10
+- Release Date: 2023-01-11
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -23,15 +23,17 @@
 - Email: peter@polidoro.io
 - Copyright: 2023 Howard Hughes Medical Institute
 - References:
+  - https://pyserial-asyncio.readthedocs.io/en/latest/
+  - https://tinkering.xyz/async-serial/
   - https://www.loadstarsensors.com/
   - https://www.loadstarsensors.com/di-100u-di-1000u-command-set.html
 - Dependencies:
-  - serial_interface
+  - pyserial-asyncio
   - click
 ```
 
 
-<a id="org343144a"></a>
+<a id="orgaa9f5cd"></a>
 
 # Example Usage
 
@@ -76,7 +78,7 @@ loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
 ```
 
 
-<a id="orgb5b473c"></a>
+<a id="org9a00832"></a>
 
 # Installation
 
@@ -172,7 +174,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="orgd439063"></a>
+<a id="org52429d5"></a>
 
 # Development
 

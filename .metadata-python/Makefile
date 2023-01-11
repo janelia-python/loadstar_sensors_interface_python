@@ -9,15 +9,16 @@ GUIX-CONTAINER = $(GUIX-SHELL) --container
 PORT = /dev/ttyUSB0
 GUIX-CONTAINER-PORT = $(GUIX-CONTAINER) --expose=$(PORT)
 DEVELOPMENT = -D -f guix/guix.scm
+GUIX-SHELL-DEVELOPMENT = $(GUIX-SHELL) $(DEVELOPMENT)
 GUIX-CONTAINER-DEVELOPMENT = $(GUIX-CONTAINER) $(DEVELOPMENT)
-GUIX-CONTAINER-GUI = $(GUIXCONTAINER-DEVELOPMENT) --preserve='^DISPLAY$$' --preserve='^TERM$$'
+GUIX-CONTAINER-GUI = $(GUIX-CONTAINER-DEVELOPMENT) --preserve='^DISPLAY$$' --preserve='^TERM$$'
 
-.PHONY: shell
-shell:
+.PHONY: guix-shell
+guix-shell:
 	$(GUIX-SHELL)
 
 .PHONY: container
-container:
+guix-container:
 	$(GUIX-CONTAINER)
 
 .PHONY: exposed-container
@@ -46,7 +47,7 @@ metadata-edits:
 
 .PHONY: metadata
 metadata:
-	$(GUIX-CONTAINER-DEVELOPMENT) -- sh -c "emacs --batch -Q  -l emacs/init.el --eval '(process-org \"metadata.org\")'"
+	$(GUIX-SHELL-DEVELOPMENT) -- sh -c "emacs --batch -Q  -l emacs/init.el --eval '(process-org \"metadata.org\")'"
 
 .PHONY: package
 package:

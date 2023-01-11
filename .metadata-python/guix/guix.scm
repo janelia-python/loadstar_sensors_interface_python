@@ -36,7 +36,7 @@
                          python-ipython))
     (propagated-inputs (list
                         ncurses
-                        python-serial-interface
+                        python-pyserial-asyncio
                         python-click))
     (home-page "")
     (synopsis "")
