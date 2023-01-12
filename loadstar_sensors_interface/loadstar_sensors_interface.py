@@ -1,8 +1,6 @@
 """Python interface to Loadstar Sensors USB devices."""
-import time
-import serial
-
-from serial_interface import SerialInterface, ReadError
+import asyncio
+import serial_asyncio
 
 
 DEBUG = False
@@ -27,29 +25,30 @@ class LoadstarSensorsInterface():
     _AVERAGING_THRESHOLD_SCALING = 4545.4556
 
     def __init__(self, *args, **kwargs):
-        """Accept SerialInterface kwargs."""
-        if 'debug' in kwargs:
-            self._debug = kwargs['debug']
-        else:
-            kwargs.update({'debug': DEBUG})
-            self._debug = DEBUG
-        if 'timeout' not in kwargs:
-            kwargs.update({'timeout': self._TIMEOUT})
-        if 'write_timeout' not in kwargs:
-            kwargs.update({'write_timeout': self._WRITE_TIMEOUT})
-        if 'write_read_delay' not in kwargs:
-            kwargs.update({'write_read_delay': self._WRITE_READ_DELAY})
-        if 'write_write_delay' not in kwargs:
-            kwargs.update({'write_write_delay': self._WRITE_WRITE_DELAY})
-        kwargs.update({'baudrate': 9600,
-                       'bytesize': serial.EIGHTBITS,
-                       'parity': serial.PARITY_NONE,
-                       'stopbits': serial.STOPBITS_ONE,
-                       'xonxoff': False,
-                       'rtscts': False,
-                       'dsrdtr': False
-                       })
-        self._serial_interface = SerialInterface(*args, **kwargs)
+        """"""
+        reader, _ = await serial_asyncio.open_serial_connection(url='./reader', baudrate=115200)
+        # if 'debug' in kwargs:
+        #     self._debug = kwargs['debug']
+        # else:
+        #     kwargs.update({'debug': DEBUG})
+        #     self._debug = DEBUG
+        # if 'timeout' not in kwargs:
+        #     kwargs.update({'timeout': self._TIMEOUT})
+        # if 'write_timeout' not in kwargs:
+        #     kwargs.update({'write_timeout': self._WRITE_TIMEOUT})
+        # if 'write_read_delay' not in kwargs:
+        #     kwargs.update({'write_read_delay': self._WRITE_READ_DELAY})
+        # if 'write_write_delay' not in kwargs:
+        #     kwargs.update({'write_write_delay': self._WRITE_WRITE_DELAY})
+        # kwargs.update({'baudrate': 9600,
+        #                'bytesize': serial.EIGHTBITS,
+        #                'parity': serial.PARITY_NONE,
+        #                'stopbits': serial.STOPBITS_ONE,
+        #                'xonxoff': False,
+        #                'rtscts': False,
+        #                'dsrdtr': False
+        #                })
+        # self._serial_interface = SerialInterface(*args, **kwargs)
 
     def get_device_info(self):
         """Query device and return information."""
