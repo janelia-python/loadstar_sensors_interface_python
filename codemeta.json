@@ -5,7 +5,7 @@
     "codeRepository": "git+https://github.com/janelia-pypi/loadstar_sensors_interface_python.git",
     "dateCreated": "2022-08-16",
     "dateModified": "2023-01-18",
-    "name": "",
+    "name": "loadstar_sensors_interface",
     "version": "0.10.0",
     "description": "Python interface to Loadstar Sensors USB devices.",
     "programmingLanguage": [

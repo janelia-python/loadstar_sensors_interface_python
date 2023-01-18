@@ -1,4 +1,4 @@
-# This file is generated automatically from metadata.org
+# This file is generated automatically from metadata
 # File edits may be overwritten!
 [build-system]
 requires = ["setuptools"]

@@ -1,5 +1,5 @@
 """Python interface to Loadstar Sensors USB devices."""
-# This file is generated automatically from metadata.org
+# This file is generated automatically from metadata
 # File edits may be overwritten!
 from setuptools import setup
 

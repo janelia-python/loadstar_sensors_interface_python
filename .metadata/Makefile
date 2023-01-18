@@ -1,66 +1,59 @@
-# This file is generated automatically from metadata.org
+# This file is generated automatically from metadata
 # File edits may be overwritten!
 
 .PHONY: upload
 upload: metadata package twine add clean
 
-GUIX-SHELL = guix time-machine -C guix/channels.scm -- shell
-GUIX-CONTAINER = $(GUIX-SHELL) --container
+MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+MAKEFILE_DIR := $(notdir $(patsubst %/,%,$(dir $(MAKEFILE_PATH))))
+GUIX-TIME-MACHINE = guix time-machine -C $(MAKEFILE_DIR)/guix/channels.scm
+GUIX-SHELL = $(GUIX-TIME-MACHINE) -- shell -f $(MAKEFILE_DIR)/guix/guix.scm
+GUIX-DEV-SHELL = $(GUIX-TIME-MACHINE) -- shell -D -f $(MAKEFILE_DIR)/guix/guix.scm
+CONTAINER = --container --preserve='^DISPLAY$$' --preserve='^TERM$$'
 PORT = /dev/ttyUSB0
-GUIX-CONTAINER-PORT = $(GUIX-CONTAINER) --expose=$(PORT)
-DEVELOPMENT = -D -f guix/guix.scm
-GUIX-SHELL-DEVELOPMENT = $(GUIX-SHELL) $(DEVELOPMENT)
-GUIX-CONTAINER-DEVELOPMENT = $(GUIX-CONTAINER) $(DEVELOPMENT)
-GUIX-CONTAINER-GUI = $(GUIX-CONTAINER-DEVELOPMENT) --preserve='^DISPLAY$$' --preserve='^TERM$$'
+GUIX-CONTAINER = $(GUIX-SHELL) $(CONTAINER) --expose=$(PORT)
+GUIX-DEV-CONTAINER = $(GUIX-DEV-SHELL) $(CONTAINER) --expose=$(PORT)
 
-.PHONY: guix-shell
-guix-shell:
-	$(GUIX-SHELL)
-
-.PHONY: container
-guix-container:
-	$(GUIX-CONTAINER)
-
-.PHONY: exposed-container
-exposed-container:
-	$(GUIX-CONTAINER-PORT)
-
-.PHONY: dev-container
-dev-container:
-	$(GUIX-CONTAINER-PORT) $(DEVELOPMENT)
+.PHONY: guix-dev-container
+guix-dev-container:
+	$(GUIX-DEV-CONTAINER)
 
 .PHONY: ipython-shell
 ipython-shell:
-	$(GUIX-CONTAINER-PORT) $(DEVELOPMENT) -- ipython
-
-.PHONY: serial-shell
-serial-shell:
-	$(GUIX-CONTAINER-PORT) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
+	$(GUIX-DEV-CONTAINER) -- ipython
 
 .PHONY: installed-shell
 installed-shell:
-	$(GUIX-CONTAINER-PORT) -f guix/guix.scm --rebuild-cache
+	$(GUIX-CONTAINER) python-ipython --rebuild-cache
 
 .PHONY: metadata-edits
 metadata-edits:
-	$(GUIX-CONTAINER-GUI) -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l emacs/init.el --file metadata.org"
+	$(GUIX-DEV-CONTAINER) -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l $(MAKEFILE_DIR)/emacs/init.el --file $(MAKEFILE_DIR)/metadata.org"
 
 .PHONY: metadata
 metadata:
-	$(GUIX-SHELL-DEVELOPMENT) -- sh -c "emacs --batch -Q  -l emacs/init.el --eval '(process-org \"metadata.org\")'"
+	$(GUIX-DEV-CONTAINER) -- sh -c "emacs --batch -Q  -l $(MAKEFILE_DIR)/emacs/init.el --eval '(process-org \"$(MAKEFILE_DIR)/metadata.org\")'"
 
 .PHONY: package
 package:
-	$(GUIX-CONTAINER-DEVELOPMENT) -- sh -c "python3 setup.py sdist bdist_wheel"
+	$(GUIX-DEV-CONTAINER) -- sh -c "python3 setup.py sdist bdist_wheel"
 
 .PHONY: twine
 twine:
-	$(GUIX-CONTAINER-DEVELOPMENT) --network --expose=$$HOME/.pypirc -- sh -c "twine upload dist/*"
+	$(GUIX-DEV-CONTAINER) --network --expose=$$HOME/.pypirc -- sh -c "twine upload dist/*"
 
 .PHONY: add
 add:
-	$(GUIX-CONTAINER-DEVELOPMENT) -- sh -c "git add --all"
+	$(GUIX-DEV-CONTAINER) -- sh -c "git add --all"
 
 .PHONY: clean
 clean:
-	$(GUIX-CONTAINER-DEVELOPMENT) -- sh -c "git clean -xdf"
+	$(GUIX-DEV-CONTAINER) -- sh -c "git clean -xdf"
+
+.PHONY: serial-shell
+serial-shell:
+	$(GUIX-CONTAINER) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
+
+.PHONY: serial-shell-hs
+serial-shell:
+	$(GUIX-CONTAINER) picocom -- picocom -b 230400 -f n -y n -d 8 -p 1 -c $(PORT)
