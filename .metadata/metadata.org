@@ -3,13 +3,13 @@
 
 # Place warning at the top of the exported file
 #+BEGIN_EXAMPLE
-<!-- This file is generated automatically from metadata.org -->
+<!-- This file is generated automatically from metadata -->
 <!-- File edits may be overwritten! -->
 #+END_EXAMPLE
 
 * Project Specific Variables                                       :noexport:
 
-#+NAME: name
+#+NAME: python-package-name
 #+BEGIN_SRC text :exports none :noweb yes
 loadstar_sensors_interface
 #+END_SRC
@@ -72,7 +72,7 @@ https://www.loadstarsensors.com/di-100u-di-1000u-command-set.html
 #+END_SRC
 
 #+NAME: release-year
-#+BEGIN_SRC emacs-lisp :exports none :noweb ye
+#+BEGIN_SRC emacs-lisp :exports none :noweb yes
 (format-time-string "%Y")
 #+END_SRC
 
@@ -154,7 +154,7 @@ Python 3
 * About
 
 #+BEGIN_SRC markdown :noweb yes
-- Name: <<name>>
+- Python Package Name: <<python-package-name>>
 - Description: <<description>>
 - Version: <<version>>
 - Release Date: <<release-date>>
@@ -271,9 +271,9 @@ The Python code in this library may be installed in any number of ways, chose on
 **** pip
 
 #+BEGIN_SRC sh :noweb yes
-python3 -m venv ~/venvs/<<name>>
-source ~/venvs/<<name>>/bin/activate
-pip install <<name>>
+python3 -m venv ~/venvs/<<python-package-name>>
+source ~/venvs/<<python-package-name>>/bin/activate
+pip install <<python-package-name>>
 #+END_SRC
 
 **** guix
@@ -301,9 +301,9 @@ The Python code in this library may be installed in any number of ways, chose on
 **** pip
 
 #+BEGIN_SRC sh :noweb yes
-python3 -m venv C:\venvs\<<name>>
-C:\venvs\<<name>>\Scripts\activate
-pip install <<name>>
+python3 -m venv C:\venvs\<<python-package-name>>
+C:\venvs\<<python-package-name>>\Scripts\activate
+pip install <<python-package-name>>
 #+END_SRC
 
 * Development
@@ -319,46 +319,68 @@ git clone <<repository-url>>
 cd <<repository-name>>
 #+END_SRC
 
+** Make alias
+
+#+BEGIN_SRC sh :noweb yes
+source .metadata/.alias
+#+END_SRC
+
 ** Edit metadata.org
 
 #+BEGIN_SRC sh :noweb yes
-make metadata-edits
+,make metadata-edits
 #+END_SRC
 
 ** Tangle metadata.org
 
 #+BEGIN_SRC sh :noweb yes
-make metadata
+,make metadata
 #+END_SRC
 
 ** Test Python package using ipython shell
 
 #+BEGIN_SRC sh :noweb yes
-make ipython-shell # PORT=/dev/ttyUSB0
-# make PORT=/dev/ttyUSB1 ipython-shell
-import <<name>>
+,make ipython-shell # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 ipython-shell
+import <<python-package-name>>
 exit
 #+END_SRC
 
 ** Test installation of Guix package
 
 #+BEGIN_SRC sh :noweb yes
-make installed-shell # PORT=/dev/ttyUSB0
-# make PORT=/dev/ttyUSB1 installed-shell
+,make installed-shell # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 installed-shell
 exit
 #+END_SRC
 
 ** Upload Python package to pypi
 
 #+BEGIN_SRC sh :noweb yes
-make upload
+,make upload
 #+END_SRC
 
 ** Test direct device interaction using serial terminal
 
+*** Low Speed
+
+DI-100, DI-1000
+
 #+BEGIN_SRC sh :noweb yes
-make serial-shell # PORT=/dev/ttyUSB0
-# make PORT=/dev/ttyUSB1 serial-shell
+,make serial-shell # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 serial-shell
+? # help
+settings
+[C-a][C-x] # to exit
+#+END_SRC
+
+*** High Speed
+
+DI-1000UHS
+
+#+BEGIN_SRC sh :noweb yes
+,make serial-shell-hs # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 serial-shell-hs
 ? # help
 settings
 [C-a][C-x] # to exit
@@ -366,48 +388,15 @@ settings
 
 * Tangled Files                                                    :noexport:
 
-#+BEGIN_SRC text :tangle ../AUTHORS :exports none :noweb yes
-<<author>>
-#+END_SRC
-
-#+BEGIN_SRC js :tangle ../codemeta.json :exports none :noweb yes
-{
-    "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
-    "@type": "SoftwareSourceCode",
-    "license": "https://spdx.org/licenses/<<license>>",
-    "codeRepository": "<<code-repository>>",
-    "dateCreated": "<<creation-date>>",
-    "dateModified": "<<release-date>>",
-    "name": "<<name>>",
-    "version": "<<version>>",
-    "description": "<<description>>",
-    "programmingLanguage": [
-        "<<programming-language>>"
-    ],
-    "author": [
-        {
-            "@type": "Person",
-            "givenName": "<<author-given-name>>",
-            "familyName": "<<author-family-name>>",
-            "email": "<<email>>",
-            "affiliation": {
-                "@type": "Organization",
-                "name": "<<affiliation>>"
-            }
-        }
-    ]
-}
-#+END_SRC
-
 #+BEGIN_SRC scheme :tangle guix/channels.scm :exports none :noweb yes
-;; This file is generated automatically from metadata.org
+;; This file is generated automatically from metadata
 ;; File edits may be overwritten!
 (list (channel
         (name 'guix)
         (url "https://git.savannah.gnu.org/git/guix.git")
         (branch "master")
         (commit
-          "234190df00ae8032db38c7a4e2c82d7d8f364990")
+          "f088763356e88c4911ee933fdafcad6ed66a7aa3")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"
@@ -422,7 +411,7 @@ settings
 #+END_SRC
 
 #+BEGIN_SRC scheme :tangle guix/guix.scm :exports none :noweb yes
-;; This file is generated automatically from metadata.org
+;; This file is generated automatically from metadata
 ;; File edits may be overwritten!
 (use-modules
  (guix packages)
@@ -435,6 +424,7 @@ settings
  (gnu packages emacs-xyz)
  (gnu packages python-build)
  (gnu packages python-xyz)
+ (gnu packages imagemagick)
  (gnu packages version-control)
  (gnu packages ncurses)
  (guix-janelia packages python-janelia)
@@ -457,7 +447,8 @@ settings
                          emacs-ox-gfm
                          python-wheel
                          python-twine
-                         python-ipython))
+                         python-ipython
+                         imagemagick))
     (propagated-inputs (list
                         ncurses
                         <<guix-dependencies>>))
@@ -469,77 +460,76 @@ settings
 python-dev-package
 #+END_SRC
 
-#+BEGIN_SRC text :tangle Makefile :exports none :noweb yes
+#+BEGIN_SRC text :tangle .alias :exports none :noweb yes
 # This file is generated automatically from metadata.org
+# File edits may be overwritten!
+alias ,make=make\ -f\ .metadata/Makefile
+#+END_SRC
+
+#+BEGIN_SRC text :tangle Makefile :exports none :noweb yes
+# This file is generated automatically from metadata
 # File edits may be overwritten!
 
 .PHONY: upload
 upload: metadata package twine add clean
 
-GUIX-SHELL = guix time-machine -C guix/channels.scm -- shell
-GUIX-CONTAINER = $(GUIX-SHELL) --container
+MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+MAKEFILE_DIR := $(notdir $(patsubst %/,%,$(dir $(MAKEFILE_PATH))))
+GUIX-TIME-MACHINE = guix time-machine -C $(MAKEFILE_DIR)/guix/channels.scm
+GUIX-SHELL = $(GUIX-TIME-MACHINE) -- shell -f $(MAKEFILE_DIR)/guix/guix.scm
+GUIX-DEV-SHELL = $(GUIX-TIME-MACHINE) -- shell -D -f $(MAKEFILE_DIR)/guix/guix.scm
+CONTAINER = --container --preserve='^DISPLAY$$' --preserve='^TERM$$'
 PORT = /dev/ttyUSB0
-GUIX-CONTAINER-PORT = $(GUIX-CONTAINER) --expose=$(PORT)
-DEVELOPMENT = -D -f guix/guix.scm
-GUIX-SHELL-DEVELOPMENT = $(GUIX-SHELL) $(DEVELOPMENT)
-GUIX-CONTAINER-DEVELOPMENT = $(GUIX-CONTAINER) $(DEVELOPMENT)
-GUIX-CONTAINER-GUI = $(GUIX-CONTAINER-DEVELOPMENT) --preserve='^DISPLAY$$' --preserve='^TERM$$'
+GUIX-CONTAINER = $(GUIX-SHELL) $(CONTAINER) --expose=$(PORT)
+GUIX-DEV-CONTAINER = $(GUIX-DEV-SHELL) $(CONTAINER) --expose=$(PORT)
 
-.PHONY: guix-shell
-guix-shell:
-	$(GUIX-SHELL)
-
-.PHONY: container
-guix-container:
-	$(GUIX-CONTAINER)
-
-.PHONY: exposed-container
-exposed-container:
-	$(GUIX-CONTAINER-PORT)
-
-.PHONY: dev-container
-dev-container:
-	$(GUIX-CONTAINER-PORT) $(DEVELOPMENT)
+.PHONY: guix-dev-container
+guix-dev-container:
+	$(GUIX-DEV-CONTAINER)
 
 .PHONY: ipython-shell
 ipython-shell:
-	$(GUIX-CONTAINER-PORT) $(DEVELOPMENT) -- ipython
-
-.PHONY: serial-shell
-serial-shell:
-	$(GUIX-CONTAINER-PORT) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
+	$(GUIX-DEV-CONTAINER) -- ipython
 
 .PHONY: installed-shell
 installed-shell:
-	$(GUIX-CONTAINER-PORT) -f guix/guix.scm --rebuild-cache
+	$(GUIX-CONTAINER) python-ipython --rebuild-cache
 
 .PHONY: metadata-edits
 metadata-edits:
-	$(GUIX-CONTAINER-GUI) -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l emacs/init.el --file metadata.org"
+	$(GUIX-DEV-CONTAINER) -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l $(MAKEFILE_DIR)/emacs/init.el --file $(MAKEFILE_DIR)/metadata.org"
 
 .PHONY: metadata
 metadata:
-	$(GUIX-SHELL-DEVELOPMENT) -- sh -c "emacs --batch -Q  -l emacs/init.el --eval '(process-org \"metadata.org\")'"
+	$(GUIX-DEV-CONTAINER) -- sh -c "emacs --batch -Q  -l $(MAKEFILE_DIR)/emacs/init.el --eval '(process-org \"$(MAKEFILE_DIR)/metadata.org\")'"
 
 .PHONY: package
 package:
-	$(GUIX-CONTAINER-DEVELOPMENT) -- sh -c "python3 setup.py sdist bdist_wheel"
+	$(GUIX-DEV-CONTAINER) -- sh -c "python3 setup.py sdist bdist_wheel"
 
 .PHONY: twine
 twine:
-	$(GUIX-CONTAINER-DEVELOPMENT) --network --expose=$$HOME/.pypirc -- sh -c "twine upload dist/*"
+	$(GUIX-DEV-CONTAINER) --network --expose=$$HOME/.pypirc -- sh -c "twine upload dist/*"
 
 .PHONY: add
 add:
-	$(GUIX-CONTAINER-DEVELOPMENT) -- sh -c "git add --all"
+	$(GUIX-DEV-CONTAINER) -- sh -c "git add --all"
 
 .PHONY: clean
 clean:
-	$(GUIX-CONTAINER-DEVELOPMENT) -- sh -c "git clean -xdf"
+	$(GUIX-DEV-CONTAINER) -- sh -c "git clean -xdf"
+
+.PHONY: serial-shell
+serial-shell:
+	$(GUIX-CONTAINER) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
+
+.PHONY: serial-shell-hs
+serial-shell:
+	$(GUIX-CONTAINER) picocom -- picocom -b 230400 -f n -y n -d 8 -p 1 -c $(PORT)
 #+END_SRC
 
 #+BEGIN_SRC scheme :tangle emacs/init.el :exports none :noweb yes
-;; This file is generated automatically from metadata.org
+;; This file is generated automatically from metadata
 ;; File edits may be overwritten!
 (require 'org)
 
@@ -571,10 +561,48 @@ clean:
   (progn (tangle-org org-file)
          (export-org org-file)))
 
+
+(defun extract-src-content (name)
+  (save-excursion
+    (org-babel-goto-named-src-block name)
+    (org-element-property :value (org-element-at-point))))
+#+END_SRC
+
+#+BEGIN_SRC text :tangle ../AUTHORS :exports none :noweb yes
+<<author>>
+#+END_SRC
+
+#+BEGIN_SRC js :tangle ../codemeta.json :exports none :noweb yes
+{
+    "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+    "@type": "SoftwareSourceCode",
+    "license": "https://spdx.org/licenses/<<license>>",
+    "codeRepository": "<<code-repository>>",
+    "dateCreated": "<<creation-date>>",
+    "dateModified": "<<release-date>>",
+    "name": "<<python-package-name>>",
+    "version": "<<version>>",
+    "description": "<<description>>",
+    "programmingLanguage": [
+        "<<programming-language>>"
+    ],
+    "author": [
+        {
+            "@type": "Person",
+            "givenName": "<<author-given-name>>",
+            "familyName": "<<author-family-name>>",
+            "email": "<<email>>",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "<<affiliation>>"
+            }
+        }
+    ]
+}
 #+END_SRC
 
 #+BEGIN_SRC text :tangle ../pyproject.toml :exports none :noweb yes
-# This file is generated automatically from metadata.org
+# This file is generated automatically from metadata
 # File edits may be overwritten!
 [build-system]
 requires = ["setuptools"]
@@ -582,10 +610,10 @@ build-backed = "setuptools.build_meta"
 #+END_SRC
 
 #+BEGIN_SRC text :tangle ../setup.cfg :exports none :noweb yes
-# This file is generated automatically from metadata.org
+# This file is generated automatically from metadata
 # File edits may be overwritten!
 [metadata]
-name = <<name>>
+name = <<python-package-name>>
 version = <<version>>
 author = <<author>>
 author_email = <<email>>
@@ -605,12 +633,12 @@ install_requires =
 
 [options.entry_points]
 console_scripts =
-    <<command-line-interface>> = <<name>>.cli:main
+    <<command-line-interface>> = <<python-package-name>>.cli:main
 #+END_SRC
 
 #+BEGIN_SRC python :tangle ../setup.py :exports none :noweb yes
 """<<description>>"""
-# This file is generated automatically from metadata.org
+# This file is generated automatically from metadata
 # File edits may be overwritten!
 from setuptools import setup
 
@@ -619,9 +647,9 @@ if __name__ == '__main__':
     setup()
 #+END_SRC
 
-#+BEGIN_SRC python :tangle ../loadstar_sensors_interface/__about__.py :exports none :noweb yes
+#+BEGIN_SRC python :tangle ../(extract-src-content python-package-name)/__about__.py :exports none :noweb yes
 """<<description>>"""
-# This file is generated automatically from metadata.org
+# This file is generated automatically from metadata
 # File edits may be overwritten!
 
 __version__ = '<<version>>'
@@ -633,11 +661,11 @@ __email__ = '<<email>>'
 __copyright__ = '<<copyright>>'
 #+END_SRC
 
-#+BEGIN_SRC python :tangle ../loadstar_sensors_interface/__init__.py :exports none :noweb yes
+#+BEGIN_SRC python :tangle ../(extract-src-content python-package-name)/__init__.py :exports none :noweb yes
 """<<description>>"""
-# This file is generated automatically from metadata.org
+# This file is generated automatically from metadata
 # File edits may be overwritten!
-from <<name>>.__about__ import (
+from <<python-package-name>>.__about__ import (
     __author__,
     __copyright__,
     __email__,
@@ -646,10 +674,11 @@ from <<name>>.__about__ import (
     __url__,
     __version__)
 
-from .<<name>> import LoadstarSensorsInterface
+from .<<python-package-name>> import LoadstarSensorsInterface
 #+END_SRC
 
-#+BEGIN_SRC text :tangle ../LICENSE :exports none :noweb yes
+#+NAME: license-text
+#+BEGIN_SRC text :exports none :noweb yes
 Janelia Open-Source Software (3-clause BSD License)
 
 Copyright <<copyright>>
@@ -679,3 +708,15 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #+END_SRC
+
+#+BEGIN_SRC text :tangle ../LICENSE :exports none :noweb yes
+<<license-text>>
+#+END_SRC
+
+#+BEGIN_SRC text :tangle LICENSE :exports none :noweb yes
+<<license-text>>
+#+END_SRC
+
+;; Local Variables:
+;; eval: (setq after-save-hook nil)
+;; End:
