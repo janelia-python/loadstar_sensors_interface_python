@@ -1,7 +1,7 @@
 """Python interface to Loadstar Sensors USB devices."""
-# This file is generated automatically from metadata.org
+# This file is generated automatically from metadata
 # File edits may be overwritten!
-from .__about__ import (
+from loadstar_sensors_interface.__about__ import (
     __author__,
     __copyright__,
     __email__,
@@ -10,4 +10,4 @@ from .__about__ import (
     __url__,
     __version__)
 
-from . import LoadstarSensorsInterface
+from .loadstar_sensors_interface import LoadstarSensorsInterface

@@ -396,7 +396,7 @@ settings
         (url "https://git.savannah.gnu.org/git/guix.git")
         (branch "master")
         (commit
-          "f088763356e88c4911ee933fdafcad6ed66a7aa3")
+          "26bb41d6d503a62e86b853774f6d8313abef2123")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"
@@ -564,10 +564,9 @@ serial-shell:
          (export-org org-file)))
 
 
-(defun extract-src-content (name)
-  (save-excursion
-    (org-babel-goto-named-src-block name)
-    (org-element-property :value (org-element-at-point))))
+(setq enable-local-variables nil)
+(setq tangle-external-files t)
+(setq python-package-dir (concat "../" "<<python-package-name>>"))
 #+END_SRC
 
 #+HEADER: :tangle (if tangle-external-files "../AUTHORS" "no")
@@ -654,7 +653,7 @@ if __name__ == '__main__':
     setup()
 #+END_SRC
 
-#+HEADER: :tangle (if tangle-external-files (concat "../" (string-trim-right (extract-src-content "python-package-name")) "/__about__.py") "no")
+#+HEADER: :tangle (if tangle-external-files  (concat python-package-dir "/__about__.py") "no")
 #+BEGIN_SRC python :exports none :noweb yes
 """<<description>>"""
 # This file is generated automatically from metadata
@@ -669,7 +668,7 @@ __email__ = '<<email>>'
 __copyright__ = '<<copyright>>'
 #+END_SRC
 
-#+HEADER: :tangle (if tangle-external-files (concat "../" (string-trim-right (extract-src-content "python-package-name")) "/__init__.py") "no")
+#+HEADER: :tangle (if tangle-external-files (concat python-package-dir "/__init__.py") "no")
 #+BEGIN_SRC python :exports none :noweb yes
 """<<description>>"""
 # This file is generated automatically from metadata
@@ -731,5 +730,5 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;; eval: (setq after-save-hook nil)
 ;; eval: (setq org-confirm-babel-evaluate nil)
 ;; eval: (setq tangle-external-files nil)
-;; eval: (defun extract-src-content (name) "")
+;; eval: (setq python-package-dir "")
 ;; End:

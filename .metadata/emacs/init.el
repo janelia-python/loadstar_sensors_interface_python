@@ -31,7 +31,6 @@
          (export-org org-file)))
 
 
-(defun extract-src-content (name)
-  (save-excursion
-    (org-babel-goto-named-src-block name)
-    (org-element-property :value (org-element-at-point))))
+(setq enable-local-variables nil)
+(setq tangle-external-files t)
+(setq python-package-dir (concat "../" "loadstar_sensors_interface"))

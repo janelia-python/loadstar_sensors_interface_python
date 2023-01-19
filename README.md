@@ -1,21 +1,21 @@
-- [About](#org6051c89)
-- [Example Usage](#orgaa9f5cd)
-- [Installation](#org9a00832)
-- [Development](#org52429d5)
+- [About](#orgea084be)
+- [Example Usage](#orgf7aebff)
+- [Installation](#orgdade2e8)
+- [Development](#org79f53ab)
 
-    <!-- This file is generated automatically from metadata.org -->
+    <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="org6051c89"></a>
+<a id="orgea084be"></a>
 
 # About
 
 ```markdown
-- Name: loadstar_sensors_interface
+- Python Package Name: loadstar_sensors_interface
 - Description: Python interface to Loadstar Sensors USB devices.
 - Version: 0.10.0
-- Release Date: 2023-01-11
+- Release Date: 2023-01-19
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -33,7 +33,7 @@
 ```
 
 
-<a id="orgaa9f5cd"></a>
+<a id="orgf7aebff"></a>
 
 # Example Usage
 
@@ -78,7 +78,7 @@ loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
 ```
 
 
-<a id="org9a00832"></a>
+<a id="orgdade2e8"></a>
 
 # Installation
 
@@ -174,7 +174,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="org52429d5"></a>
+<a id="org79f53ab"></a>
 
 # Development
 
@@ -192,25 +192,32 @@ cd loadstar_sensors_interface_python
 ```
 
 
+## Make alias
+
+```sh
+source .metadata/.alias
+```
+
+
 ## Edit metadata.org
 
 ```sh
-make metadata-edits
+,make metadata-edits
 ```
 
 
 ## Tangle metadata.org
 
 ```sh
-make metadata
+,make metadata
 ```
 
 
 ## Test Python package using ipython shell
 
 ```sh
-make ipython-shell # PORT=/dev/ttyUSB0
-# make PORT=/dev/ttyUSB1 ipython-shell
+,make ipython-shell # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 ipython-shell
 import loadstar_sensors_interface
 exit
 ```
@@ -219,8 +226,8 @@ exit
 ## Test installation of Guix package
 
 ```sh
-make installed-shell # PORT=/dev/ttyUSB0
-# make PORT=/dev/ttyUSB1 installed-shell
+,make installed-shell # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 installed-shell
 exit
 ```
 
@@ -228,15 +235,33 @@ exit
 ## Upload Python package to pypi
 
 ```sh
-make upload
+,make upload
 ```
 
 
 ## Test direct device interaction using serial terminal
 
+
+### Low Speed
+
+DI-100, DI-1000
+
 ```sh
-make serial-shell # PORT=/dev/ttyUSB0
-# make PORT=/dev/ttyUSB1 serial-shell
+,make serial-shell # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 serial-shell
+? # help
+settings
+[C-a][C-x] # to exit
+```
+
+
+### High Speed
+
+DI-1000UHS
+
+```sh
+,make serial-shell-hs # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 serial-shell-hs
 ? # help
 settings
 [C-a][C-x] # to exit
