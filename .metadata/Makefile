@@ -10,9 +10,11 @@ GUIX-TIME-MACHINE = guix time-machine -C $(MAKEFILE_DIR)/guix/channels.scm
 GUIX-SHELL = $(GUIX-TIME-MACHINE) -- shell -f $(MAKEFILE_DIR)/guix/guix.scm
 GUIX-DEV-SHELL = $(GUIX-TIME-MACHINE) -- shell -D -f $(MAKEFILE_DIR)/guix/guix.scm
 CONTAINER = --container --preserve='^DISPLAY$$' --preserve='^TERM$$'
+GUIX-CONTAINER = $(GUIX-SHELL) $(CONTAINER)
+GUIX-DEV-CONTAINER = $(GUIX-DEV-SHELL) $(CONTAINER)
 PORT = /dev/ttyUSB0
-GUIX-CONTAINER = $(GUIX-SHELL) $(CONTAINER) --expose=$(PORT)
-GUIX-DEV-CONTAINER = $(GUIX-DEV-SHELL) $(CONTAINER) --expose=$(PORT)
+GUIX-CONTAINER-PORT = $(GUIX-SHELL) $(CONTAINER) --expose=$(PORT)
+GUIX-DEV-CONTAINER-PORT = $(GUIX-DEV-SHELL) $(CONTAINER) --expose=$(PORT)
 
 .PHONY: guix-dev-container
 guix-dev-container:
@@ -20,11 +22,11 @@ guix-dev-container:
 
 .PHONY: ipython-shell
 ipython-shell:
-	$(GUIX-DEV-CONTAINER) -- ipython
+	$(GUIX-DEV-CONTAINER-PORT) -- ipython
 
 .PHONY: installed-shell
 installed-shell:
-	$(GUIX-CONTAINER) python-ipython --rebuild-cache
+	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache
 
 .PHONY: metadata-edits
 metadata-edits:
@@ -52,8 +54,8 @@ clean:
 
 .PHONY: serial-shell
 serial-shell:
-	$(GUIX-CONTAINER) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
+	$(GUIX-CONTAINER-PORT) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
 
 .PHONY: serial-shell-hs
 serial-shell:
-	$(GUIX-CONTAINER) picocom -- picocom -b 230400 -f n -y n -d 8 -p 1 -c $(PORT)
+	$(GUIX-CONTAINER-PORT) picocom -- picocom -b 230400 -f n -y n -d 8 -p 1 -c $(PORT)

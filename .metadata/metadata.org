@@ -479,9 +479,11 @@ GUIX-TIME-MACHINE = guix time-machine -C $(MAKEFILE_DIR)/guix/channels.scm
 GUIX-SHELL = $(GUIX-TIME-MACHINE) -- shell -f $(MAKEFILE_DIR)/guix/guix.scm
 GUIX-DEV-SHELL = $(GUIX-TIME-MACHINE) -- shell -D -f $(MAKEFILE_DIR)/guix/guix.scm
 CONTAINER = --container --preserve='^DISPLAY$$' --preserve='^TERM$$'
+GUIX-CONTAINER = $(GUIX-SHELL) $(CONTAINER)
+GUIX-DEV-CONTAINER = $(GUIX-DEV-SHELL) $(CONTAINER)
 PORT = /dev/ttyUSB0
-GUIX-CONTAINER = $(GUIX-SHELL) $(CONTAINER) --expose=$(PORT)
-GUIX-DEV-CONTAINER = $(GUIX-DEV-SHELL) $(CONTAINER) --expose=$(PORT)
+GUIX-CONTAINER-PORT = $(GUIX-SHELL) $(CONTAINER) --expose=$(PORT)
+GUIX-DEV-CONTAINER-PORT = $(GUIX-DEV-SHELL) $(CONTAINER) --expose=$(PORT)
 
 .PHONY: guix-dev-container
 guix-dev-container:
@@ -489,11 +491,11 @@ guix-dev-container:
 
 .PHONY: ipython-shell
 ipython-shell:
-	$(GUIX-DEV-CONTAINER) -- ipython
+	$(GUIX-DEV-CONTAINER-PORT) -- ipython
 
 .PHONY: installed-shell
 installed-shell:
-	$(GUIX-CONTAINER) python-ipython --rebuild-cache
+	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache
 
 .PHONY: metadata-edits
 metadata-edits:
@@ -521,11 +523,11 @@ clean:
 
 .PHONY: serial-shell
 serial-shell:
-	$(GUIX-CONTAINER) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
+	$(GUIX-CONTAINER-PORT) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
 
 .PHONY: serial-shell-hs
 serial-shell:
-	$(GUIX-CONTAINER) picocom -- picocom -b 230400 -f n -y n -d 8 -p 1 -c $(PORT)
+	$(GUIX-CONTAINER-PORT) picocom -- picocom -b 230400 -f n -y n -d 8 -p 1 -c $(PORT)
 #+END_SRC
 
 #+BEGIN_SRC scheme :tangle emacs/init.el :exports none :noweb yes
@@ -568,11 +570,13 @@ serial-shell:
     (org-element-property :value (org-element-at-point))))
 #+END_SRC
 
-#+BEGIN_SRC text :tangle ../AUTHORS :exports none :noweb yes
+#+HEADER: :tangle (if tangle-external-files "../AUTHORS" "no")
+#+BEGIN_SRC text :exports none :noweb yes
 <<author>>
 #+END_SRC
 
-#+BEGIN_SRC js :tangle ../codemeta.json :exports none :noweb yes
+#+HEADER: :tangle (if tangle-external-files "../codemeta.json" "no")
+#+BEGIN_SRC js :exports none :noweb yes
 {
     "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
     "@type": "SoftwareSourceCode",
@@ -601,7 +605,8 @@ serial-shell:
 }
 #+END_SRC
 
-#+BEGIN_SRC text :tangle ../pyproject.toml :exports none :noweb yes
+#+HEADER: :tangle (if tangle-external-files "../pyproject.toml" "no")
+#+BEGIN_SRC text :exports none :noweb yes
 # This file is generated automatically from metadata
 # File edits may be overwritten!
 [build-system]
@@ -609,7 +614,8 @@ requires = ["setuptools"]
 build-backed = "setuptools.build_meta"
 #+END_SRC
 
-#+BEGIN_SRC text :tangle ../setup.cfg :exports none :noweb yes
+#+HEADER: :tangle (if tangle-external-files "../setup.cfg" "no")
+#+BEGIN_SRC text :exports none :noweb yes
 # This file is generated automatically from metadata
 # File edits may be overwritten!
 [metadata]
@@ -636,7 +642,8 @@ console_scripts =
     <<command-line-interface>> = <<python-package-name>>.cli:main
 #+END_SRC
 
-#+BEGIN_SRC python :tangle ../setup.py :exports none :noweb yes
+#+HEADER: :tangle (if tangle-external-files "../setup.py" "no")
+#+BEGIN_SRC python :exports none :noweb yes
 """<<description>>"""
 # This file is generated automatically from metadata
 # File edits may be overwritten!
@@ -647,7 +654,8 @@ if __name__ == '__main__':
     setup()
 #+END_SRC
 
-#+BEGIN_SRC python :tangle ../(extract-src-content python-package-name)/__about__.py :exports none :noweb yes
+#+HEADER: :tangle (if tangle-external-files (concat "../" (string-trim-right (extract-src-content "python-package-name")) "/__about__.py") "no")
+#+BEGIN_SRC python :exports none :noweb yes
 """<<description>>"""
 # This file is generated automatically from metadata
 # File edits may be overwritten!
@@ -661,7 +669,8 @@ __email__ = '<<email>>'
 __copyright__ = '<<copyright>>'
 #+END_SRC
 
-#+BEGIN_SRC python :tangle ../(extract-src-content python-package-name)/__init__.py :exports none :noweb yes
+#+HEADER: :tangle (if tangle-external-files (concat "../" (string-trim-right (extract-src-content "python-package-name")) "/__init__.py") "no")
+#+BEGIN_SRC python :exports none :noweb yes
 """<<description>>"""
 # This file is generated automatically from metadata
 # File edits may be overwritten!
@@ -709,7 +718,8 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #+END_SRC
 
-#+BEGIN_SRC text :tangle ../LICENSE :exports none :noweb yes
+#+HEADER: :tangle (if tangle-external-files "../LICENSE" "no")
+#+BEGIN_SRC text :exports none :noweb yes
 <<license-text>>
 #+END_SRC
 
@@ -719,4 +729,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Local Variables:
 ;; eval: (setq after-save-hook nil)
+;; eval: (setq org-confirm-babel-evaluate nil)
+;; eval: (setq tangle-external-files nil)
+;; eval: (defun extract-src-content (name) "")
 ;; End:
