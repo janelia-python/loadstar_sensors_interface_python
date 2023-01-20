@@ -396,7 +396,7 @@ settings
         (url "https://git.savannah.gnu.org/git/guix.git")
         (branch "master")
         (commit
-          "26bb41d6d503a62e86b853774f6d8313abef2123")
+          "2491a60404b69da20c2b4fd952e5d5e326374d1d")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"
