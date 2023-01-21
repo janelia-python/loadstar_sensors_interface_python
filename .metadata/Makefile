@@ -57,5 +57,5 @@ serial-shell:
 	$(GUIX-CONTAINER-PORT) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
 
 .PHONY: serial-shell-hs
-serial-shell:
+serial-shell-hs:
 	$(GUIX-CONTAINER-PORT) picocom -- picocom -b 230400 -f n -y n -d 8 -p 1 -c $(PORT)

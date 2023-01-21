@@ -1,13 +1,13 @@
-- [About](#orgea084be)
-- [Example Usage](#orgf7aebff)
-- [Installation](#orgdade2e8)
-- [Development](#org79f53ab)
+- [About](#org1d10c14)
+- [Example Usage](#org282d392)
+- [Installation](#org578304f)
+- [Development](#org27ca34b)
 
     <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="orgea084be"></a>
+<a id="org1d10c14"></a>
 
 # About
 
@@ -15,7 +15,7 @@
 - Python Package Name: loadstar_sensors_interface
 - Description: Python interface to Loadstar Sensors USB devices.
 - Version: 0.10.0
-- Release Date: 2023-01-19
+- Release Date: 2023-01-21
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -33,7 +33,7 @@
 ```
 
 
-<a id="orgf7aebff"></a>
+<a id="org282d392"></a>
 
 # Example Usage
 
@@ -78,7 +78,7 @@ loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
 ```
 
 
-<a id="orgdade2e8"></a>
+<a id="org578304f"></a>
 
 # Installation
 
@@ -174,7 +174,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="org79f53ab"></a>
+<a id="org27ca34b"></a>
 
 # Development
 
