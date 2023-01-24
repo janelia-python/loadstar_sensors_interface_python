@@ -26,7 +26,7 @@ python-loadstar-sensors-interface
 
 #+NAME: version
 #+BEGIN_SRC text :exports none :noweb yes
-0.10.0
+0.11.0
 #+END_SRC
 
 #+NAME: description
@@ -340,8 +340,7 @@ source .metadata/.alias
 ** Test Python package using ipython shell
 
 #+BEGIN_SRC sh :noweb yes
-,make ipython-shell # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 ipython-shell
+,make ipython-shell
 import <<python-package-name>>
 exit
 #+END_SRC
@@ -349,8 +348,7 @@ exit
 ** Test installation of Guix package
 
 #+BEGIN_SRC sh :noweb yes
-,make installed-shell # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 installed-shell
+,make installed-shell
 exit
 #+END_SRC
 
@@ -386,6 +384,23 @@ settings
 [C-a][C-x] # to exit
 #+END_SRC
 
+** Test Python package using ipython shell and serial port
+
+#+BEGIN_SRC sh :noweb yes
+,make ipython-shell-port # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 ipython-shell-port
+import <<python-package-name>>
+exit
+#+END_SRC
+
+** Test installation of Guix package and serial port
+
+#+BEGIN_SRC sh :noweb yes
+,make installed-shell-port # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 installed-shell-port
+exit
+#+END_SRC
+
 * Tangled Files                                                    :noexport:
 
 #+BEGIN_SRC scheme :tangle guix/channels.scm :exports none :noweb yes
@@ -396,7 +411,7 @@ settings
         (url "https://git.savannah.gnu.org/git/guix.git")
         (branch "master")
         (commit
-          "2491a60404b69da20c2b4fd952e5d5e326374d1d")
+          "3a1b18aa4540e6f96ded0a98dd907a8033262582")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"
@@ -430,7 +445,7 @@ settings
  (guix-janelia packages python-janelia)
  (guix-janelia packages python-xyz))
 
-(define %source-dir (dirname (current-filename)))
+(define %source-dir (dirname (dirname (dirname (current-filename)))))
 
 (define-public python-dev-package
   (package
@@ -481,9 +496,6 @@ GUIX-DEV-SHELL = $(GUIX-TIME-MACHINE) -- shell -D -f $(MAKEFILE_DIR)/guix/guix.s
 CONTAINER = --container --preserve='^DISPLAY$$' --preserve='^TERM$$'
 GUIX-CONTAINER = $(GUIX-SHELL) $(CONTAINER)
 GUIX-DEV-CONTAINER = $(GUIX-DEV-SHELL) $(CONTAINER)
-PORT = /dev/ttyUSB0
-GUIX-CONTAINER-PORT = $(GUIX-SHELL) $(CONTAINER) --expose=$(PORT)
-GUIX-DEV-CONTAINER-PORT = $(GUIX-DEV-SHELL) $(CONTAINER) --expose=$(PORT)
 
 .PHONY: guix-dev-container
 guix-dev-container:
@@ -491,11 +503,11 @@ guix-dev-container:
 
 .PHONY: ipython-shell
 ipython-shell:
-	$(GUIX-DEV-CONTAINER-PORT) -- ipython
+	$(GUIX-DEV-CONTAINER) -- ipython
 
 .PHONY: installed-shell
 installed-shell:
-	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache
+	$(GUIX-CONTAINER) python-ipython --rebuild-cache
 
 .PHONY: metadata-edits
 metadata-edits:
@@ -521,13 +533,25 @@ add:
 clean:
 	$(GUIX-DEV-CONTAINER) -- sh -c "git clean -xdf"
 
+PORT = /dev/ttyUSB0
+GUIX-CONTAINER-PORT = $(GUIX-SHELL) $(CONTAINER) --expose=$(PORT)
+GUIX-DEV-CONTAINER-PORT = $(GUIX-DEV-SHELL) $(CONTAINER) --expose=$(PORT)
+
 .PHONY: serial-shell
 serial-shell:
-	$(GUIX-CONTAINER-PORT) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
+	$(GUIX-DEV-CONTAINER-PORT) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
 
 .PHONY: serial-shell-hs
 serial-shell-hs:
-	$(GUIX-CONTAINER-PORT) picocom -- picocom -b 230400 -f n -y n -d 8 -p 1 -c $(PORT)
+	$(GUIX-DEV-CONTAINER-PORT) picocom -- picocom -b 230400 -f n -y n -d 8 -p 1 -c $(PORT)
+
+.PHONY: ipython-shell-port
+ipython-shell-port:
+	$(GUIX-DEV-CONTAINER-PORT) -- ipython
+
+.PHONY: installed-shell-port
+installed-shell-port:
+	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache
 #+END_SRC
 
 #+BEGIN_SRC scheme :tangle emacs/init.el :exports none :noweb yes
@@ -683,7 +707,7 @@ from <<python-package-name>>.__about__ import (
     __url__,
     __version__)
 
-from .<<python-package-name>> import LoadstarSensorsInterface
+from .<<python-package-name>> import main
 #+END_SRC
 
 #+NAME: license-text

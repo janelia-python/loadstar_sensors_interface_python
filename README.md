@@ -1,21 +1,21 @@
-- [About](#org1d10c14)
-- [Example Usage](#org282d392)
-- [Installation](#org578304f)
-- [Development](#org27ca34b)
+- [About](#org130d763)
+- [Example Usage](#org3f46cd4)
+- [Installation](#orga4e645a)
+- [Development](#org7bc8393)
 
     <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="org1d10c14"></a>
+<a id="org130d763"></a>
 
 # About
 
 ```markdown
 - Python Package Name: loadstar_sensors_interface
 - Description: Python interface to Loadstar Sensors USB devices.
-- Version: 0.10.0
-- Release Date: 2023-01-21
+- Version: 0.11.0
+- Release Date: 2023-01-24
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -33,7 +33,7 @@
 ```
 
 
-<a id="org282d392"></a>
+<a id="org3f46cd4"></a>
 
 # Example Usage
 
@@ -78,7 +78,7 @@ loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
 ```
 
 
-<a id="org578304f"></a>
+<a id="orga4e645a"></a>
 
 # Installation
 
@@ -174,7 +174,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="org27ca34b"></a>
+<a id="org7bc8393"></a>
 
 # Development
 
@@ -216,8 +216,7 @@ source .metadata/.alias
 ## Test Python package using ipython shell
 
 ```sh
-,make ipython-shell # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 ipython-shell
+,make ipython-shell
 import loadstar_sensors_interface
 exit
 ```
@@ -226,8 +225,7 @@ exit
 ## Test installation of Guix package
 
 ```sh
-,make installed-shell # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 installed-shell
+,make installed-shell
 exit
 ```
 
@@ -265,4 +263,23 @@ DI-1000UHS
 ? # help
 settings
 [C-a][C-x] # to exit
+```
+
+
+## Test Python package using ipython shell and serial port
+
+```sh
+,make ipython-shell-port # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 ipython-shell-port
+import loadstar_sensors_interface
+exit
+```
+
+
+## Test installation of Guix package and serial port
+
+```sh
+,make installed-shell-port # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 installed-shell-port
+exit
 ```
