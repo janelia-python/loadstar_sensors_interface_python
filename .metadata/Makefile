@@ -68,3 +68,7 @@ ipython-shell-port:
 .PHONY: installed-shell-port
 installed-shell-port:
 	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache
+
+.PHONY: installed-ipython-shell-port
+installed-ipython-shell-port:
+	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache -- ipython

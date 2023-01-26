@@ -1,111 +1,136 @@
 """Python interface to Loadstar Sensors USB devices."""
 import asyncio
 import serial_asyncio
+from time import perf_counter
 
 
 DEBUG = False
 
 
-class InputChunkProtocol(asyncio.Protocol):
-    def connection_made(self, transport):
-        self.transport = transport
-        self.transport.serial.write(b'wc\r')
+class LoadstarSensorsInterface():
+    """Loadstar Sensors USB device."""
 
-    def data_received(self, data):
-        print('data received', repr(data))
-
-        # stop callbacks again immediately
-        self.pause_reading()
-
-    def pause_reading(self):
-        # This will stop the callbacks to data_received
-        self.transport.pause_reading()
-
-    def resume_reading(self):
-        # This will start the callbacks to data_received again with all data that has been received in the meantime.
-        self.transport.resume_reading()
-
-
-async def reader(loop):
-    transport, protocol = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, '/dev/ttyUSB0', baudrate=230400)
-
-    while True:
-        await asyncio.sleep(0.3)
-        protocol.resume_reading()
-
-
-def main():
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(reader(loop))
-    loop.close()
-
-if __name__ == '__main__':
-    main()
-
-# class LoadstarSensorsInterface():
-#     """Loadstar Sensors USB device."""
-
-    # _TIMEOUT = 0.05
-    # _WRITE_TIMEOUT = 0.05
-    # _WRITE_READ_DELAY = 0.001
-    # _WRITE_WRITE_DELAY = 0.005
-    # _REQUEST_EOL = '\r'
-    # _RESPONSE_EOL = b'\r\n'
-    # _READ_ATTEMPTS = 100
-    # _DURATION_BETWEEN_ATTEMPTS = 0.01
-    # _GOOD_RESPONSE = b'A'
+    _REQUEST_EOL = b'\r'
+    _RESPONSE_EOL = b'\n'
+    _MAX_TRY_COUNT = 100
+    _GOOD_RESPONSE = b'A'
+    _READ_TIMEOUT = 1.0
     # _AVERAGING_WINDOW_MIN = 1
     # _AVERAGING_WINDOW_MAX = 1024
     # _AVERAGING_THRESHOLD_MIN = 1
     # _AVERAGING_THRESHOLD_MAX = 100
     # _AVERAGING_THRESHOLD_SCALING = 4545.4556
 
-    # def __init__(self, *args, **kwargs):
-    #     """"""
-        # reader, _ = await serial_asyncio.open_serial_connection(url='./reader', baudrate=115200)
-        # if 'debug' in kwargs:
-        #     self._debug = kwargs['debug']
-        # else:
-        #     kwargs.update({'debug': DEBUG})
-        #     self._debug = DEBUG
-        # if 'timeout' not in kwargs:
-        #     kwargs.update({'timeout': self._TIMEOUT})
-        # if 'write_timeout' not in kwargs:
-        #     kwargs.update({'write_timeout': self._WRITE_TIMEOUT})
-        # if 'write_read_delay' not in kwargs:
-        #     kwargs.update({'write_read_delay': self._WRITE_READ_DELAY})
-        # if 'write_write_delay' not in kwargs:
-        #     kwargs.update({'write_write_delay': self._WRITE_WRITE_DELAY})
-        # kwargs.update({'baudrate': 9600,
-        #                'bytesize': serial.EIGHTBITS,
-        #                'parity': serial.PARITY_NONE,
-        #                'stopbits': serial.STOPBITS_ONE,
-        #                'xonxoff': False,
-        #                'rtscts': False,
-        #                'dsrdtr': False
-        #                })
-        # self._serial_interface = SerialInterface(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        """ """
+        self._write_lock = asyncio.Lock()
+        self._read_lock = asyncio.Lock()
+        self._write_read_lock = asyncio.Lock()
+        self._port = None
+        self._reader = None
+        self._writer = None
+        self._getting_sensor_values = False
+        self._sensor_value_count = 0
 
-    # def get_device_info(self):
-    #     """Query device and return information."""
-    #     device_info = {}
-    #     device_info['port'] = self.get_port()
-    #     device_info['model'] = self.get_model()
-    #     device_info['id'] = self.get_id()
-    #     device_info['native_units'] = self.get_native_units()
-    #     device_info['load_capacity'] = self.get_load_capacity()
-    #     device_info['averaging_window'] = self.get_averaging_window()
+    async def _open_serial_connection(self, port, baudrate):
+        """ """
+        self._port = port
+        self._reader, self._writer = await serial_asyncio.open_serial_connection(url=port, baudrate=baudrate)
+        await self._read_until_no_response()
+        await self._write_empty_request_until_good_response()
+
+    async def open_high_speed_serial_connection(self, port='/dev/ttyUSB0'):
+        """ """
+        await self._open_serial_connection(port, baudrate=230400)
+
+    async def open_low_speed_serial_connection(self, port='/dev/ttyUSB0'):
+        """ """
+        await self._open_serial_connection(port, baudrate=9600)
+
+    async def _write(self, request=b''):
+        """ """
+        async with self._write_lock:
+            await asyncio.sleep(0)
+            self._writer.write(request + self._REQUEST_EOL)
+
+    async def _read(self):
+        """ """
+        async with self._read_lock:
+            response = b''
+            response = await self._reader.readuntil(self._RESPONSE_EOL)
+            response = response.strip()
+            return response
+
+    async def _write_read(self, request=b''):
+        async with self._write_read_lock:
+            await self._write(request)
+            response = await self._read()
+            return response
+
+    async def _read_until_no_response(self):
+        while True:
+            try:
+                await asyncio.wait_for(self._read(), timeout=self._READ_TIMEOUT)
+            except asyncio.TimeoutError:
+                return
+
+    async def _write_empty_request_until_good_response(self):
+        try_count = 0
+        while try_count < self._MAX_TRY_COUNT:
+            try_count += 1
+            print(f'try_count: {try_count}')
+            response = await self._write_read()
+            if response == self._GOOD_RESPONSE:
+                return
+            else:
+                print(f'got: {response}')
+
+    async def start_getting_sensor_values(self):
+        if not self._getting_sensor_values:
+            self._getting_sensor_values = True
+            self._sensor_value_count = 0
+            await self._write(b'wc')
+            self._start_counter = perf_counter()
+            while self._getting_sensor_values:
+                response = await self._read()
+                try:
+                    sensor_value = float(response)
+                    self._sensor_value_count += 1
+                    print(f'{self._sensor_value_count}: {sensor_value}')
+                except ValueError:
+                    print(f'{response} cannot be converted to float!')
+
+    async def stop_getting_sensor_values(self):
+        await asyncio.sleep(0)
+        self._getting_sensor_values = False
+        end_counter = perf_counter()
+        await self._write()
+        await self._read_until_no_response()
+        duration = end_counter - self._start_counter
+        print(f'{self._sensor_value_count} values took: {duration}')
+        values_per_second = self._sensor_value_count / duration
+        print(f'values_per_second: {values_per_second}')
+
+    async def get_device_info(self):
+        """Query device and return information."""
+        device_info = {}
+        device_info['port'] = self.get_port()
+        device_info['model'] = await self.get_model()
+        device_info['id'] = await self.get_id()
+        device_info['native_units'] = await self.get_native_units()
+        device_info['load_capacity'] = await self.get_load_capacity()
+        # device_info['averaging_window'] = await self.get_averaging_window_in_samples()
     #     device_info['averaging_threshold'] = self.get_averaging_threshold()
-    #     return device_info
+        return device_info
 
-    # def print_device_info(self, additional_device_info={}):
-    #     """Query device and print information."""
-    #     device_info = self.get_device_info()
-    #     device_info.update(additional_device_info)
-    #     print('device info:')
-    #     for key, value in device_info.items():
-    #         print(f'{key:<25}{value}')
-    #     print('')
+    async def print_device_info(self, additional_device_info={}):
+        """Query device and print information."""
+        device_info = await self.get_device_info()
+        device_info.update(additional_device_info)
+        print('device info:')
+        for key, value in device_info.items():
+            print(f'{key:<25}{value}')
+        print('')
 
     # def tare(self):
     #     """Reset sensor values so current value is zero."""
@@ -118,43 +143,17 @@ if __name__ == '__main__':
     #             self._sleep()
     #     return False
 
-    # def get_sensor_value(self):
-    #     """Sensor value."""
-    #     for x in range(self._READ_ATTEMPTS):
-    #         try:
-    #             response = self._send_request_get_response('w')
-    #             sensor_value = float(response)
-    #             return sensor_value
-    #         except ValueError:
-    #             self._debug_print('ValueError')
-    #             self._sleep()
-    #     return None
-
-    # # 4 seconds seems max
-    # def get_sensor_values_for_duration(self, duration):
-    #     """Sensor value."""
-    #     for x in range(self._READ_ATTEMPTS):
-    #         try:
-    #             self._serial_interface.write(b'wc\r')
-    #             time.sleep(duration)
-    #             self._serial_interface.write(b'\r')
-    #             full_response = b''
-    #             while True:
-    #                 response = self._serial_interface.read()
-    #                 if len(response) == 0:
-    #                     break
-    #                 full_response += response
-    #             sensor_values = full_response.split(b'\r\n')
-    #             sensor_value_count = len(sensor_values)
-    #             # print(f'sensor_value_count = {sensor_value_count}')
-    #             sensor_values_per_second = sensor_value_count / duration
-    #             # print(f'sensor_values_per_second = {sensor_values_per_second}')
-    #             sensor_values = [float(x) for x in sensor_values if len(x) > 0]
-    #             return sensor_values
-    #         except ValueError:
-    #             self._debug_print('ValueError')
-    #             self._sleep()
-    #     return None
+    async def get_sensor_value(self):
+        """Sensor value."""
+        sensor_value = None
+        response = await self._write_read(b'w')
+        try:
+            sensor_value = float(response)
+            self._sensor_value_count += 1
+            print(f'{self._sensor_value_count}: {sensor_value}')
+        except ValueError:
+            print(f'{response} cannot be converted to float!')
+        return sensor_value
 
     # def get_adc_value(self):
     #     """ADC value."""
@@ -168,37 +167,37 @@ if __name__ == '__main__':
     #             self._sleep()
     #     return None
 
-    # def get_port(self):
-    #     """Sensor device name."""
-    #     return self._serial_interface.port
+    def get_port(self):
+        """Sensor device name."""
+        return self._port
 
-    # def get_model(self):
-    #     """Sensor device model."""
-    #     response = self._send_request_get_response('model')
-    #     response = response.decode()
-    #     return response
+    async def get_model(self):
+        """Sensor device model."""
+        response = await self._write_read(b'model')
+        response = response.decode()
+        return response
 
-    # def get_id(self):
-    #     """Sensor device id."""
-    #     response = self._send_request_get_response('id')
-    #     response = response.decode()
-    #     return response
+    async def get_id(self):
+        """Sensor device id."""
+        response = await self._write_read(b'id')
+        response = response.decode()
+        return response
 
-    # def get_native_units(self):
-    #     """Sensor value units."""
-    #     response = self._send_request_get_response('unit')
-    #     response = response.decode()
-    #     return response
+    async def get_native_units(self):
+        """Sensor value units."""
+        response = await self._write_read(b'unit')
+        response = response.decode()
+        return response
 
-    # def get_load_capacity(self):
-    #     """Maximum sensor value in native units."""
-    #     response = self._send_request_get_response('lc')
-    #     load_capacity = float(response)
-    #     return load_capacity
+    async def get_load_capacity(self):
+        """Maximum sensor value in native units."""
+        response = await self._write_read(b'lc')
+        load_capacity = float(response)
+        return load_capacity
 
-    # def get_averaging_window_in_samples(self):
+    # async def get_averaging_window_in_samples(self):
     #     """Count of samples to average (1-1024 samples)."""
-    #     response = self._send_request_get_response('css')
+    #     response = await self._write_read(b'css')
     #     averaging_window = int(response)
     #     return averaging_window
 
@@ -209,11 +208,11 @@ if __name__ == '__main__':
     #         averaging_window = self._AVERAGING_WINDOW_MIN
     #     if averaging_window > self._AVERAGING_WINDOW_MAX:
     #         averaging_window = self._AVERAGING_WINDOW_MAX
-    #     self._send_request_get_response('css ' + str(averaging_window))
+    #     self._write_read(b'css ' + str(averaging_window))
 
     # def get_averaging_threshold_in_percent(self):
     #     """Percentage of capacity below which average is performed (1-100%)."""
-    #     response = self._send_request_get_response('cla')
+    #     response = self._write_read(b'cla')
     #     # e.g. b'00000\t( 2.1999995e-01)'
     #     averaging_threshold = float(response.decode().split('(')[1].split(')')[0])
     #     averaging_threshold *= self._AVERAGING_THRESHOLD_SCALING
@@ -228,10 +227,10 @@ if __name__ == '__main__':
     #     if averaging_threshold > self._AVERAGING_THRESHOLD_MAX:
     #         averaging_threshold = self._AVERAGING_THRESHOLD_MAX
     #     averaging_threshold = averaging_threshold/self._AVERAGING_THRESHOLD_MAX
-    #     self._send_request_get_response('cla ' + str(averaging_threshold))
+    #     self._write_read(b'cla ' + str(averaging_threshold))
 
     # def _get_device_settings(self):
-    #     response = self._send_request_get_response('settings')
+    #     response = self._write_read(b'settings')
     #     settings = []
     #     for x in range(self._READ_ATTEMPTS):
     #         response = self._serial_interface.readline()
@@ -291,3 +290,19 @@ if __name__ == '__main__':
     # def _debug_print(self, to_print):
     #     if self._debug:
     #         print(to_print)
+
+async def main():
+    dev = LoadstarSensorsInterface()
+    await dev.open_high_speed_serial_connection()
+    await dev.print_device_info()
+    task = asyncio.create_task(dev.start_getting_sensor_values())
+    await asyncio.sleep(4)
+    await dev.stop_getting_sensor_values()
+    await task
+    for _ in range(2):
+        await dev.get_sensor_value()
+        await asyncio.sleep(1)
+    await dev.print_device_info()
+
+if __name__ == '__main__':
+    asyncio.run(main())
