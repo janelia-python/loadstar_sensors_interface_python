@@ -1,21 +1,21 @@
-- [About](#org509c134)
-- [Example Usage](#org5e17671)
-- [Installation](#orgd40adc9)
-- [Development](#orgc6cf639)
+- [About](#orge67d4d1)
+- [Example Usage](#orgb79d588)
+- [Installation](#orgad3cf84)
+- [Development](#org9c7e8fb)
 
     <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="org509c134"></a>
+<a id="orge67d4d1"></a>
 
 # About
 
 ```markdown
 - Python Package Name: loadstar_sensors_interface
-- Description: Python interface to Loadstar Sensors USB devices.
-- Version: 0.11.0
-- Release Date: 2023-01-26
+- Description: Python async interface to Loadstar Sensors USB devices.
+- Version: 1.0.0
+- Release Date: 2023-01-27
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -33,7 +33,7 @@
 ```
 
 
-<a id="org5e17671"></a>
+<a id="orgb79d588"></a>
 
 # Example Usage
 
@@ -42,20 +42,24 @@
 
 ```python
 from loadstar_sensors_interface import LoadstarSensorsInterface
-dev = LoadstarSensorsInterface() # Try to automatically detect port
-dev = LoadstarSensorsInterface(port='/dev/ttyUSB0') # GNU/Linux specific port
-dev = LoadstarSensorsInterface(port='/dev/tty.usbmodem262471') # Mac OS X specific port
-dev = LoadstarSensorsInterface(port='COM3') # Windows specific port
+import asyncio
 
-device_info = dev.get_device_info()
-dev.tare()
-sensor_value = dev.get_sensor_value()
-sensor_values = dev.get_sensor_values_for_duration(4)
+async def my_sensor_value_callback(sensor_value):
+    print(f'my_sensor_value_callback: {sensor_value}')
+    await asyncio.sleep(0)
 
-dev.set_averaging_window_in_samples(5) # 1-1024 samples
-averaging_window = dev.get_averaging_window_in_samples()
-dev.set_averaging_threshold_in_percent(25) # 1-100 percent
-averaging_threshold = dev.get_averaging_threshold_in_percent()
+async def example():
+    dev = LoadstarSensorsInterface(debug=False)
+    await dev.open_high_speed_serial_connection(port='/dev/ttyUSB0')
+    await dev.print_device_info()
+    await dev.tare()
+    task = asyncio.create_task(dev.start_getting_sensor_values(my_sensor_value_callback))
+    await asyncio.sleep(10)
+    await dev.stop_getting_sensor_values()
+    await task
+
+asyncio.run(example())
+
 ```
 
 
@@ -78,7 +82,7 @@ loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
 ```
 
 
-<a id="orgd40adc9"></a>
+<a id="orgad3cf84"></a>
 
 # Installation
 
@@ -174,7 +178,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="orgc6cf639"></a>
+<a id="org9c7e8fb"></a>
 
 # Development
 

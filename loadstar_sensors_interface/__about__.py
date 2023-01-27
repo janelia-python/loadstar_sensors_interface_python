@@ -1,9 +1,9 @@
-"""Python interface to Loadstar Sensors USB devices."""
+"""Python async interface to Loadstar Sensors USB devices."""
 # This file is generated automatically from metadata
 # File edits may be overwritten!
 
-__version__ = '0.11.0'
-__description__ = 'Python interface to Loadstar Sensors USB devices.'
+__version__ = '1.0.0'
+__description__ = 'Python async interface to Loadstar Sensors USB devices.'
 __license__ = 'BSD-3-Clause'
 __url__ = 'https://github.com/janelia-pypi/loadstar_sensors_interface_python'
 __author__ = 'Peter Polidoro'

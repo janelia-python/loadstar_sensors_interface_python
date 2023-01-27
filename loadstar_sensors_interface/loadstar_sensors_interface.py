@@ -4,8 +4,9 @@ import serial_asyncio
 from time import perf_counter
 
 
-DEBUG = False
-
+async def sensor_value_callback(sensor_value):
+    print(f'sensor_value_callback: {sensor_value}')
+    await asyncio.sleep(0)
 
 class LoadstarSensorsInterface():
     """Loadstar Sensors USB device."""
@@ -15,14 +16,11 @@ class LoadstarSensorsInterface():
     _MAX_TRY_COUNT = 100
     _GOOD_RESPONSE = b'A'
     _READ_TIMEOUT = 1.0
-    # _AVERAGING_WINDOW_MIN = 1
-    # _AVERAGING_WINDOW_MAX = 1024
-    # _AVERAGING_THRESHOLD_MIN = 1
-    # _AVERAGING_THRESHOLD_MAX = 100
-    # _AVERAGING_THRESHOLD_SCALING = 4545.4556
+    _TARE_SLEEP = 1.0
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, debug=False):
         """ """
+        self._debug = debug
         self._write_lock = asyncio.Lock()
         self._read_lock = asyncio.Lock()
         self._write_read_lock = asyncio.Lock()
@@ -31,6 +29,7 @@ class LoadstarSensorsInterface():
         self._writer = None
         self._getting_sensor_values = False
         self._sensor_value_count = 0
+        self._debug_print('LoadstarSensorsInterface initialized')
 
     async def _open_serial_connection(self, port, baudrate):
         """ """
@@ -38,6 +37,7 @@ class LoadstarSensorsInterface():
         self._reader, self._writer = await serial_asyncio.open_serial_connection(url=port, baudrate=baudrate)
         await self._read_until_no_response()
         await self._write_empty_request_until_good_response()
+        self._debug_print(f'serial connection opened with port: {port}, baudrate: {baudrate}')
 
     async def open_high_speed_serial_connection(self, port='/dev/ttyUSB0'):
         """ """
@@ -51,7 +51,9 @@ class LoadstarSensorsInterface():
         """ """
         async with self._write_lock:
             await asyncio.sleep(0)
-            self._writer.write(request + self._REQUEST_EOL)
+            request += self._REQUEST_EOL
+            self._writer.write(request)
+            self._debug_print(f'request: {request}')
 
     async def _read(self):
         """ """
@@ -59,6 +61,7 @@ class LoadstarSensorsInterface():
             response = b''
             response = await self._reader.readuntil(self._RESPONSE_EOL)
             response = response.strip()
+            self._debug_print(f'response: {response}')
             return response
 
     async def _write_read(self, request=b''):
@@ -70,7 +73,8 @@ class LoadstarSensorsInterface():
     async def _read_until_no_response(self):
         while True:
             try:
-                await asyncio.wait_for(self._read(), timeout=self._READ_TIMEOUT)
+                response = await asyncio.wait_for(self._read(), timeout=self._READ_TIMEOUT)
+                self._debug_print(f'_read_until_no_response: {response}')
             except asyncio.TimeoutError:
                 return
 
@@ -78,14 +82,12 @@ class LoadstarSensorsInterface():
         try_count = 0
         while try_count < self._MAX_TRY_COUNT:
             try_count += 1
-            print(f'try_count: {try_count}')
             response = await self._write_read()
+            self._debug_print(f'_write_empty_request_until_good_response: {response}')
             if response == self._GOOD_RESPONSE:
                 return
-            else:
-                print(f'got: {response}')
 
-    async def start_getting_sensor_values(self):
+    async def start_getting_sensor_values(self, callback=sensor_value_callback):
         if not self._getting_sensor_values:
             self._getting_sensor_values = True
             self._sensor_value_count = 0
@@ -96,9 +98,10 @@ class LoadstarSensorsInterface():
                 try:
                     sensor_value = float(response)
                     self._sensor_value_count += 1
-                    print(f'{self._sensor_value_count}: {sensor_value}')
+                    self._debug_print(f'{self._sensor_value_count}: {sensor_value}')
+                    await callback(sensor_value)
                 except ValueError:
-                    print(f'{response} cannot be converted to float!')
+                    self._debug_print(f'{response} cannot be converted to float!')
 
     async def stop_getting_sensor_values(self):
         await asyncio.sleep(0)
@@ -107,9 +110,9 @@ class LoadstarSensorsInterface():
         await self._write()
         await self._read_until_no_response()
         duration = end_counter - self._start_counter
-        print(f'{self._sensor_value_count} values took: {duration}')
+        self._debug_print(f'{self._sensor_value_count} values took: {duration}')
         values_per_second = self._sensor_value_count / duration
-        print(f'values_per_second: {values_per_second}')
+        self._debug_print(f'values_per_second: {values_per_second}')
 
     async def get_device_info(self):
         """Query device and return information."""
@@ -119,8 +122,6 @@ class LoadstarSensorsInterface():
         device_info['id'] = await self.get_id()
         device_info['native_units'] = await self.get_native_units()
         device_info['load_capacity'] = await self.get_load_capacity()
-        # device_info['averaging_window'] = await self.get_averaging_window_in_samples()
-    #     device_info['averaging_threshold'] = self.get_averaging_threshold()
         return device_info
 
     async def print_device_info(self, additional_device_info={}):
@@ -132,16 +133,17 @@ class LoadstarSensorsInterface():
             print(f'{key:<25}{value}')
         print('')
 
-    # def tare(self):
-    #     """Reset sensor values so current value is zero."""
-    #     for x in range(self._READ_ATTEMPTS):
-    #         response = self._send_request_get_response('tare')
-    #         if response == self._GOOD_RESPONSE:
-    #             return True
-    #         else:
-    #             self._debug_print('bad response')
-    #             self._sleep()
-    #     return False
+    async def tare(self):
+        """Reset sensor values so current value is zero."""
+        self._debug_print('taring')
+        for _ in range(self._MAX_TRY_COUNT):
+            response = await self._write_read(b'tare')
+            if response == self._GOOD_RESPONSE:
+                return True
+            else:
+                self._debug_print('bad response')
+        asyncio.sleep(self._TARE_SLEEP)
+        return False
 
     async def get_sensor_value(self):
         """Sensor value."""
@@ -149,23 +151,21 @@ class LoadstarSensorsInterface():
         response = await self._write_read(b'w')
         try:
             sensor_value = float(response)
-            self._sensor_value_count += 1
-            print(f'{self._sensor_value_count}: {sensor_value}')
+            self._debug_print(f'sensor_value: {sensor_value}')
         except ValueError:
-            print(f'{response} cannot be converted to float!')
+            self._debug_print(f'{response} cannot be converted to float!')
         return sensor_value
 
-    # def get_adc_value(self):
-    #     """ADC value."""
-    #     for x in range(self._READ_ATTEMPTS):
-    #         try:
-    #             response = self._send_request_get_response('r')
-    #             sensor_value = float(response)
-    #             return sensor_value
-    #         except ValueError:
-    #             self._debug_print('ValueError')
-    #             self._sleep()
-    #     return None
+    async def get_adc_value(self):
+        """ADC value."""
+        adc_value = None
+        response = await self._write_read(b'r')
+        try:
+            adc_value = int(response)
+            self._debug_print(f'adc_value: {adc_value}')
+        except ValueError:
+            self._debug_print(f'{response} cannot be converted to int!')
+        return adc_value
 
     def get_port(self):
         """Sensor device name."""
@@ -195,106 +195,15 @@ class LoadstarSensorsInterface():
         load_capacity = float(response)
         return load_capacity
 
-    # async def get_averaging_window_in_samples(self):
-    #     """Count of samples to average (1-1024 samples)."""
-    #     response = await self._write_read(b'css')
-    #     averaging_window = int(response)
-    #     return averaging_window
+    def _debug_print(self, to_print):
+        if self._debug:
+            print(to_print)
 
-    # def set_averaging_window_in_samples(self, averaging_window):
-    #     """Count of samples to average (1-1024 samples)."""
-    #     averaging_window = int(averaging_window)
-    #     if averaging_window < self._AVERAGING_WINDOW_MIN:
-    #         averaging_window = self._AVERAGING_WINDOW_MIN
-    #     if averaging_window > self._AVERAGING_WINDOW_MAX:
-    #         averaging_window = self._AVERAGING_WINDOW_MAX
-    #     self._write_read(b'css ' + str(averaging_window))
-
-    # def get_averaging_threshold_in_percent(self):
-    #     """Percentage of capacity below which average is performed (1-100%)."""
-    #     response = self._write_read(b'cla')
-    #     # e.g. b'00000\t( 2.1999995e-01)'
-    #     averaging_threshold = float(response.decode().split('(')[1].split(')')[0])
-    #     averaging_threshold *= self._AVERAGING_THRESHOLD_SCALING
-    #     averaging_threshold = int(averaging_threshold)
-    #     return averaging_threshold
-
-    # def set_averaging_threshold_in_percent(self, averaging_threshold):
-    #     """Percentage of capacity below which average is performed (1-100%)."""
-    #     averaging_threshold = int(averaging_threshold)
-    #     if averaging_threshold < self._AVERAGING_THRESHOLD_MIN:
-    #         averaging_threshold = self._AVERAGING_THRESHOLD_MIN
-    #     if averaging_threshold > self._AVERAGING_THRESHOLD_MAX:
-    #         averaging_threshold = self._AVERAGING_THRESHOLD_MAX
-    #     averaging_threshold = averaging_threshold/self._AVERAGING_THRESHOLD_MAX
-    #     self._write_read(b'cla ' + str(averaging_threshold))
-
-    # def _get_device_settings(self):
-    #     response = self._write_read(b'settings')
-    #     settings = []
-    #     for x in range(self._READ_ATTEMPTS):
-    #         response = self._serial_interface.readline()
-    #         if response == b'' or response == self._GOOD_RESPONSE:
-    #             break
-    #         else:
-    #             settings.append(response.strip().decode())
-    #     return settings
-
-    # def _send_request_get_response(self, request, use_readline=True):
-    #     self._send_test_requests_until_response_is_valid()
-    #     return self._write_read(request, use_readline)
-
-    # def _write_read(self, request, use_readline=True):
-    #     for x in range(self._READ_ATTEMPTS):
-    #         try:
-    #             self._debug_print(request)
-    #             self._serial_interface.reset_input_buffer()
-    #             self._serial_interface.reset_output_buffer()
-    #             response = self._serial_interface.write_read(
-    #                 request + self._REQUEST_EOL,
-    #                 use_readline=use_readline,
-    #                 check_write_freq=True,
-    #                 max_read_attempts=1000)
-    #             self._debug_print(response)
-    #             if response and not response.strip() == b'':
-    #                 return response.strip()
-    #             else:
-    #                 self._debug_print('no response')
-    #                 self._sleep()
-    #         except ReadError:
-    #             self._debug_print('ReadError')
-    #             self._sleep()
-    #     return None
-
-    # def _sleep(self):
-    #     time.sleep(self._DURATION_BETWEEN_ATTEMPTS)
-
-    # def _send_test_request(self):
-    #     response = self._write_read('', use_readline=False)
-    #     return response
-
-    # def _response_is_valid_from_test_request(self):
-    #     response = self._send_test_request()
-    #     return response.strip() == self._GOOD_RESPONSE
-
-    # def _send_test_requests_until_response_is_valid(self):
-    #     for x in range(self._READ_ATTEMPTS):
-    #         if self._response_is_valid_from_test_request():
-    #             self._debug_print('response is valid from test request')
-    #             return True
-    #         else:
-    #             self._debug_print('response is not valid from test request')
-    #             self._sleep()
-    #     return False
-
-    # def _debug_print(self, to_print):
-    #     if self._debug:
-    #         print(to_print)
-
-async def main():
-    dev = LoadstarSensorsInterface()
-    await dev.open_high_speed_serial_connection()
+async def test():
+    dev = LoadstarSensorsInterface(debug=True)
+    await dev.open_high_speed_serial_connection(port='/dev/ttyUSB0')
     await dev.print_device_info()
+    await asyncio.sleep(2)
     task = asyncio.create_task(dev.start_getting_sensor_values())
     await asyncio.sleep(4)
     await dev.stop_getting_sensor_values()
@@ -302,7 +211,10 @@ async def main():
     for _ in range(2):
         await dev.get_sensor_value()
         await asyncio.sleep(1)
+    for _ in range(2):
+        await dev.get_adc_value()
+        await asyncio.sleep(1)
     await dev.print_device_info()
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    asyncio.run(test())

@@ -1,4 +1,4 @@
-"""Python interface to Loadstar Sensors USB devices."""
+"""Python async interface to Loadstar Sensors USB devices."""
 # This file is generated automatically from metadata
 # File edits may be overwritten!
 from loadstar_sensors_interface.__about__ import (
@@ -10,4 +10,4 @@ from loadstar_sensors_interface.__about__ import (
     __url__,
     __version__)
 
-from .loadstar_sensors_interface import LoadstarSensorsInterface, main
+from .loadstar_sensors_interface import LoadstarSensorsInterface, test

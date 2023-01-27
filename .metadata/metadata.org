@@ -26,12 +26,12 @@ python-loadstar-sensors-interface
 
 #+NAME: version
 #+BEGIN_SRC text :exports none :noweb yes
-0.11.0
+1.0.0
 #+END_SRC
 
 #+NAME: description
 #+BEGIN_SRC text :exports none :noweb yes
-Python interface to Loadstar Sensors USB devices.
+Python async interface to Loadstar Sensors USB devices.
 #+END_SRC
 
 #+NAME: python-dependencies
@@ -176,20 +176,24 @@ Python 3
 
 #+BEGIN_SRC python
 from loadstar_sensors_interface import LoadstarSensorsInterface
-dev = LoadstarSensorsInterface() # Try to automatically detect port
-dev = LoadstarSensorsInterface(port='/dev/ttyUSB0') # GNU/Linux specific port
-dev = LoadstarSensorsInterface(port='/dev/tty.usbmodem262471') # Mac OS X specific port
-dev = LoadstarSensorsInterface(port='COM3') # Windows specific port
+import asyncio
 
-device_info = dev.get_device_info()
-dev.tare()
-sensor_value = dev.get_sensor_value()
-sensor_values = dev.get_sensor_values_for_duration(4)
+async def my_sensor_value_callback(sensor_value):
+    print(f'my_sensor_value_callback: {sensor_value}')
+    await asyncio.sleep(0)
 
-dev.set_averaging_window_in_samples(5) # 1-1024 samples
-averaging_window = dev.get_averaging_window_in_samples()
-dev.set_averaging_threshold_in_percent(25) # 1-100 percent
-averaging_threshold = dev.get_averaging_threshold_in_percent()
+async def example():
+    dev = LoadstarSensorsInterface(debug=False)
+    await dev.open_high_speed_serial_connection(port='/dev/ttyUSB0')
+    await dev.print_device_info()
+    await dev.tare()
+    task = asyncio.create_task(dev.start_getting_sensor_values(my_sensor_value_callback))
+    await asyncio.sleep(10)
+    await dev.stop_getting_sensor_values()
+    await task
+
+asyncio.run(example())
+
 #+END_SRC
 
 ** Command Line
@@ -411,7 +415,7 @@ exit
         (url "https://git.savannah.gnu.org/git/guix.git")
         (branch "master")
         (commit
-          "0e480ca7b60428a62fc4681d7aca6c7c067add42")
+          "729eabc6ae8aae32584408f6bbd4526ad21e3476")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"
@@ -711,7 +715,7 @@ from <<python-package-name>>.__about__ import (
     __url__,
     __version__)
 
-from .<<python-package-name>> import LoadstarSensorsInterface, main
+from .<<python-package-name>> import LoadstarSensorsInterface, test
 #+END_SRC
 
 #+NAME: license-text
