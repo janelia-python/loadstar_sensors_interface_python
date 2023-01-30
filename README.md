@@ -1,13 +1,13 @@
-- [About](#orge67d4d1)
-- [Example Usage](#orgb79d588)
-- [Installation](#orgad3cf84)
-- [Development](#org9c7e8fb)
+- [About](#orgc574338)
+- [Example Usage](#org142b95e)
+- [Installation](#org6c17d2b)
+- [Development](#org34f28e7)
 
     <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="orge67d4d1"></a>
+<a id="orgc574338"></a>
 
 # About
 
@@ -15,7 +15,7 @@
 - Python Package Name: loadstar_sensors_interface
 - Description: Python async interface to Loadstar Sensors USB devices.
 - Version: 1.0.0
-- Release Date: 2023-01-27
+- Release Date: 2023-01-30
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -33,7 +33,7 @@
 ```
 
 
-<a id="orgb79d588"></a>
+<a id="org142b95e"></a>
 
 # Example Usage
 
@@ -53,13 +53,11 @@ async def example():
     await dev.open_high_speed_serial_connection(port='/dev/ttyUSB0')
     await dev.print_device_info()
     await dev.tare()
-    task = asyncio.create_task(dev.start_getting_sensor_values(my_sensor_value_callback))
-    await asyncio.sleep(10)
+    dev.start_getting_sensor_values(my_sensor_value_callback)
+    await asyncio.sleep(4)
     await dev.stop_getting_sensor_values()
-    await task
 
 asyncio.run(example())
-
 ```
 
 
@@ -82,7 +80,7 @@ loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
 ```
 
 
-<a id="orgad3cf84"></a>
+<a id="org6c17d2b"></a>
 
 # Installation
 
@@ -178,7 +176,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="org9c7e8fb"></a>
+<a id="org34f28e7"></a>
 
 # Development
 

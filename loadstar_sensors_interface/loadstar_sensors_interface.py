@@ -1,7 +1,6 @@
 """Python interface to Loadstar Sensors USB devices."""
 import asyncio
 import serial_asyncio
-from time import perf_counter
 
 
 async def sensor_value_callback(sensor_value):
@@ -13,7 +12,8 @@ class LoadstarSensorsInterface():
 
     _REQUEST_EOL = b'\r'
     _RESPONSE_EOL = b'\n'
-    _MAX_TRY_COUNT = 100
+    _TARE_RESPONSE = b'Tared'
+    _MAX_TRY_COUNT = 10
     _GOOD_RESPONSE = b'A'
     _READ_TIMEOUT = 1.0
     _TARE_SLEEP = 1.0
@@ -21,6 +21,7 @@ class LoadstarSensorsInterface():
     def __init__(self, debug=False):
         """ """
         self._debug = debug
+        self._debug_print('LoadstarSensorsInterface initializing...')
         self._write_lock = asyncio.Lock()
         self._read_lock = asyncio.Lock()
         self._write_read_lock = asyncio.Lock()
@@ -29,22 +30,25 @@ class LoadstarSensorsInterface():
         self._writer = None
         self._getting_sensor_values = False
         self._sensor_value_count = 0
+        self._getting_sensor_values_task = None
         self._debug_print('LoadstarSensorsInterface initialized')
 
     async def _open_serial_connection(self, port, baudrate):
         """ """
         self._port = port
         self._reader, self._writer = await serial_asyncio.open_serial_connection(url=port, baudrate=baudrate)
+        self._debug_print(f'serial connection opened with port: {port}, baudrate: {baudrate}')
         await self._read_until_no_response()
         await self._write_empty_request_until_good_response()
-        self._debug_print(f'serial connection opened with port: {port}, baudrate: {baudrate}')
 
     async def open_high_speed_serial_connection(self, port='/dev/ttyUSB0'):
         """ """
+        self._debug_print('Opening high speed serial connection...')
         await self._open_serial_connection(port, baudrate=230400)
 
     async def open_low_speed_serial_connection(self, port='/dev/ttyUSB0'):
         """ """
+        self._debug_print('Opening low speed serial connection...')
         await self._open_serial_connection(port, baudrate=9600)
 
     async def _write(self, request=b''):
@@ -59,7 +63,10 @@ class LoadstarSensorsInterface():
         """ """
         async with self._read_lock:
             response = b''
-            response = await self._reader.readuntil(self._RESPONSE_EOL)
+            try:
+                response = await asyncio.wait_for(self._reader.readuntil(self._RESPONSE_EOL), timeout=self._READ_TIMEOUT)
+            except asyncio.TimeoutError:
+                pass
             response = response.strip()
             self._debug_print(f'response: {response}')
             return response
@@ -71,29 +78,32 @@ class LoadstarSensorsInterface():
             return response
 
     async def _read_until_no_response(self):
+        self._debug_print(f'_read_until_no_response...')
         while True:
-            try:
-                response = await asyncio.wait_for(self._read(), timeout=self._READ_TIMEOUT)
+                response = await self._read()
                 self._debug_print(f'_read_until_no_response: {response}')
-            except asyncio.TimeoutError:
-                return
+                if response == b'':
+                    break
+        self._debug_print(f'_read_until_no_response complete')
 
     async def _write_empty_request_until_good_response(self):
         try_count = 0
+        self._debug_print(f'_write_empty_request_until_good_response...')
         while try_count < self._MAX_TRY_COUNT:
             try_count += 1
             response = await self._write_read()
             self._debug_print(f'_write_empty_request_until_good_response: {response}')
+            if response == b'':
+                raise ConnectionError('Sensor not found, check power and connections!')
             if response == self._GOOD_RESPONSE:
+                self._debug_print(f'_write_empty_request_until_good_response complete')
                 return
 
-    async def start_getting_sensor_values(self, callback=sensor_value_callback):
-        if not self._getting_sensor_values:
-            self._getting_sensor_values = True
-            self._sensor_value_count = 0
-            await self._write(b'wc')
-            self._start_counter = perf_counter()
-            while self._getting_sensor_values:
+    async def _getting_sensor_values_loop(self, callback):
+        self._sensor_value_count = 0
+        await self._write(b'wc')
+        try:
+            while True:
                 response = await self._read()
                 try:
                     sensor_value = float(response)
@@ -102,17 +112,20 @@ class LoadstarSensorsInterface():
                     await callback(sensor_value)
                 except ValueError:
                     self._debug_print(f'{response} cannot be converted to float!')
+        except asyncio.CancelledError:
+            self._debug_print(f'_getting_sensor_values_loop canceled')
+
+    def start_getting_sensor_values(self, callback=sensor_value_callback):
+        if not self._getting_sensor_values:
+            self._getting_sensor_values = True
+            self._getting_sensor_values_task = asyncio.create_task(self._getting_sensor_values_loop(callback))
 
     async def stop_getting_sensor_values(self):
-        await asyncio.sleep(0)
-        self._getting_sensor_values = False
-        end_counter = perf_counter()
         await self._write()
+        await asyncio.sleep(0.05)
+        self._getting_sensor_values_task.cancel()
         await self._read_until_no_response()
-        duration = end_counter - self._start_counter
-        self._debug_print(f'{self._sensor_value_count} values took: {duration}')
-        values_per_second = self._sensor_value_count / duration
-        self._debug_print(f'values_per_second: {values_per_second}')
+        self._getting_sensor_values = False
 
     async def get_device_info(self):
         """Query device and return information."""
@@ -138,11 +151,13 @@ class LoadstarSensorsInterface():
         self._debug_print('taring')
         for _ in range(self._MAX_TRY_COUNT):
             response = await self._write_read(b'tare')
-            if response == self._GOOD_RESPONSE:
+            if response == self._TARE_RESPONSE or response == self._GOOD_RESPONSE:
+                self._debug_print('taring succeeded')
                 return True
             else:
-                self._debug_print('bad response')
-        asyncio.sleep(self._TARE_SLEEP)
+                self._debug_print('bad response from taring')
+                asyncio.sleep(self._TARE_SLEEP)
+        self._debug_print('taring failed')
         return False
 
     async def get_sensor_value(self):
