@@ -2,7 +2,7 @@
     "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
     "@type": "SoftwareSourceCode",
     "license": "https://spdx.org/licenses/BSD-3-Clause",
-    "codeRepository": "git+https://github.com/janelia-pypi/loadstar_sensors_interface_python.git",
+    "codeRepository": "https://github.com/janelia-pypi/loadstar_sensors_interface_python",
     "dateCreated": "2022-08-16",
     "dateModified": "2023-02-01",
     "name": "loadstar_sensors_interface",

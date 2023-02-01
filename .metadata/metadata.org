@@ -111,9 +111,9 @@ github.com
 https://<<forge>>/<<repository-organization>>/<<repository-name>>
 #+END_SRC
 
-#+NAME: code-repository
+#+NAME: git-clone-url
 #+BEGIN_SRC text :exports none :noweb yes
-git+<<repository-url>>.git
+git@<<forge>>:<<repository-organization>>/<<repository-name>>.git
 #+END_SRC
 
 #+NAME: author-given-name
@@ -345,7 +345,7 @@ pip install <<python-package-name>>
 ** Clone Repository
 
 #+BEGIN_SRC sh :noweb yes
-git clone <<code-repository>>
+git clone <<git-clone-url>>
 cd <<repository-name>>
 #+END_SRC
 
@@ -639,7 +639,7 @@ installed-ipython-shell-port:
     "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
     "@type": "SoftwareSourceCode",
     "license": "https://spdx.org/licenses/<<license>>",
-    "codeRepository": "<<code-repository>>",
+    "codeRepository": "<<repository-url>>",
     "dateCreated": "<<creation-date>>",
     "dateModified": "<<release-date>>",
     "name": "<<python-package-name>>",

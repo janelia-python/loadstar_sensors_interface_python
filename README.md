@@ -1,13 +1,13 @@
-- [About](#org1c311cd)
-- [Example Usage](#orgdc1686e)
-- [Installation](#org0aed3cd)
-- [Development](#orgdf24f85)
+- [About](#org212cbee)
+- [Example Usage](#orgdf5ad2a)
+- [Installation](#orgc577921)
+- [Development](#org7151bd5)
 
     <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="org1c311cd"></a>
+<a id="org212cbee"></a>
 
 # About
 
@@ -33,7 +33,7 @@
 ```
 
 
-<a id="orgdc1686e"></a>
+<a id="orgdf5ad2a"></a>
 
 # Example Usage
 
@@ -111,7 +111,7 @@ loadstar --port /dev/ttyUSB0 --high-speed --tare --duration 10
 ```
 
 
-<a id="org0aed3cd"></a>
+<a id="orgc577921"></a>
 
 # Installation
 
@@ -207,7 +207,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="orgdf24f85"></a>
+<a id="org7151bd5"></a>
 
 # Development
 
@@ -220,7 +220,7 @@ The Python code in this library may be installed in any number of ways, chose on
 ## Clone Repository
 
 ```sh
-git clone git+https://github.com/janelia-pypi/loadstar_sensors_interface_python.git
+git clone git@github.com:janelia-pypi/loadstar_sensors_interface_python.git
 cd loadstar_sensors_interface_python
 ```
 
