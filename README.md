@@ -1,13 +1,13 @@
-- [About](#org30a416b)
-- [Example Usage](#orgc5652b9)
-- [Installation](#org0ada027)
-- [Development](#org438ecfb)
+- [About](#org1c311cd)
+- [Example Usage](#orgdc1686e)
+- [Installation](#org0aed3cd)
+- [Development](#orgdf24f85)
 
     <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="org30a416b"></a>
+<a id="org1c311cd"></a>
 
 # About
 
@@ -15,7 +15,7 @@
 - Python Package Name: loadstar_sensors_interface
 - Description: Python async interface to Loadstar Sensors USB devices.
 - Version: 1.0.0
-- Release Date: 2023-01-31
+- Release Date: 2023-02-01
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -33,7 +33,7 @@
 ```
 
 
-<a id="orgc5652b9"></a>
+<a id="orgdc1686e"></a>
 
 # Example Usage
 
@@ -111,7 +111,7 @@ loadstar --port /dev/ttyUSB0 --high-speed --tare --duration 10
 ```
 
 
-<a id="org0ada027"></a>
+<a id="org0aed3cd"></a>
 
 # Installation
 
@@ -207,7 +207,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="org438ecfb"></a>
+<a id="orgdf24f85"></a>
 
 # Development
 
@@ -220,7 +220,7 @@ The Python code in this library may be installed in any number of ways, chose on
 ## Clone Repository
 
 ```sh
-git clone https://github.com/janelia-pypi/loadstar_sensors_interface_python
+git clone git+https://github.com/janelia-pypi/loadstar_sensors_interface_python.git
 cd loadstar_sensors_interface_python
 ```
 
