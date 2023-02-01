@@ -1,13 +1,13 @@
-- [About](#orgc574338)
-- [Example Usage](#org142b95e)
-- [Installation](#org6c17d2b)
-- [Development](#org34f28e7)
+- [About](#org30a416b)
+- [Example Usage](#orgc5652b9)
+- [Installation](#org0ada027)
+- [Development](#org438ecfb)
 
     <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="orgc574338"></a>
+<a id="org30a416b"></a>
 
 # About
 
@@ -15,7 +15,7 @@
 - Python Package Name: loadstar_sensors_interface
 - Description: Python async interface to Loadstar Sensors USB devices.
 - Version: 1.0.0
-- Release Date: 2023-01-30
+- Release Date: 2023-01-31
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -33,7 +33,7 @@
 ```
 
 
-<a id="org142b95e"></a>
+<a id="orgc5652b9"></a>
 
 # Example Usage
 
@@ -49,13 +49,17 @@ async def my_sensor_value_callback(sensor_value):
     await asyncio.sleep(0)
 
 async def example():
-    dev = LoadstarSensorsInterface(debug=False)
+    dev = LoadstarSensorsInterface()
     await dev.open_high_speed_serial_connection(port='/dev/ttyUSB0')
-    await dev.print_device_info()
     await dev.tare()
     dev.start_getting_sensor_values(my_sensor_value_callback)
     await asyncio.sleep(4)
     await dev.stop_getting_sensor_values()
+    count = dev.get_sensor_value_count()
+    duration = dev.get_sensor_value_duration()
+    rate = dev.get_sensor_value_rate()
+    print(f'{count} sensor values in {duration}s at a rate of {rate}Hz')
+    await dev.print_device_info()
 
 asyncio.run(example())
 ```
@@ -63,24 +67,51 @@ asyncio.run(example())
 
 ## Command Line
 
+
+### help
+
 ```sh
 loadstar --help
 # Usage: loadstar [OPTIONS]
 
+#   Command line interface for loadstar sensors.
+
+# Options:
+#   -p, --port TEXT         Device name (e.g. /dev/ttyUSB0 on GNU/Linux or COM3
+#                           on Windows)
+#   -H, --high-speed        Open serial port with high speed baudrate.
+#   -d, --debug             Print debugging information.
+#   -i, --info              Print the device info and exit
+#   -T, --tare              Tare before getting sensor values.
+#   -d, --duration INTEGER  Duration of sensor value measurements in seconds.
+#                           [default: 10]
+#   -h, --help              Show this message and exit.
 ```
+
+
+### device info
 
 ```sh
-loadstar --info
+# DI-100, DI-1000
+loadstar --port /dev/ttyUSB0 --info
 
+# DI-1000UHS
+loadstar --port /dev/ttyUSB0 --high-speed --info
 ```
+
+
+### example usage
 
 ```sh
-loadstar -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
+# DI-100, DI-1000
+loadstar --port /dev/ttyUSB0 --tare --duration 10
 
+# DI-1000UHS
+loadstar --port /dev/ttyUSB0 --high-speed --tare --duration 10
 ```
 
 
-<a id="org6c17d2b"></a>
+<a id="org0ada027"></a>
 
 # Installation
 
@@ -176,7 +207,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="org34f28e7"></a>
+<a id="org438ecfb"></a>
 
 # Development
 

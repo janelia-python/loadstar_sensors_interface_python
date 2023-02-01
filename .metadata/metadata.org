@@ -183,35 +183,63 @@ async def my_sensor_value_callback(sensor_value):
     await asyncio.sleep(0)
 
 async def example():
-    dev = LoadstarSensorsInterface(debug=False)
+    dev = LoadstarSensorsInterface()
     await dev.open_high_speed_serial_connection(port='/dev/ttyUSB0')
-    await dev.print_device_info()
     await dev.tare()
     dev.start_getting_sensor_values(my_sensor_value_callback)
     await asyncio.sleep(4)
     await dev.stop_getting_sensor_values()
+    count = dev.get_sensor_value_count()
+    duration = dev.get_sensor_value_duration()
+    rate = dev.get_sensor_value_rate()
+    print(f'{count} sensor values in {duration}s at a rate of {rate}Hz')
+    await dev.print_device_info()
 
 asyncio.run(example())
 #+END_SRC
 
 ** Command Line
 
+*** help
+
 #+BEGIN_SRC sh :noweb yes
 <<command-line-interface>> --help
 # Usage: <<command-line-interface>> [OPTIONS]
 
+#   Command line interface for loadstar sensors.
+
+# Options:
+#   -p, --port TEXT         Device name (e.g. /dev/ttyUSB0 on GNU/Linux or COM3
+#                           on Windows)
+#   -H, --high-speed        Open serial port with high speed baudrate.
+#   -d, --debug             Print debugging information.
+#   -i, --info              Print the device info and exit
+#   -T, --tare              Tare before getting sensor values.
+#   -d, --duration INTEGER  Duration of sensor value measurements in seconds.
+#                           [default: 10]
+#   -h, --help              Show this message and exit.
 #+END_SRC
 
 #+RESULTS:
 
-#+BEGIN_SRC sh :noweb yes
-<<command-line-interface>> --info
+*** device info
 
+#+BEGIN_SRC sh :noweb yes
+# DI-100, DI-1000
+<<command-line-interface>> --port /dev/ttyUSB0 --info
+
+# DI-1000UHS
+<<command-line-interface>> --port /dev/ttyUSB0 --high-speed --info
 #+END_SRC
 
-#+BEGIN_SRC sh :noweb yes
-<<command-line-interface>> -p /dev/ttyUSB0 --tare -s LB_TO_GM -w 1 -t 25 -f 2 -d 10
+*** example usage
 
+#+BEGIN_SRC sh :noweb yes
+# DI-100, DI-1000
+<<command-line-interface>> --port /dev/ttyUSB0 --tare --duration 10
+
+# DI-1000UHS
+<<command-line-interface>> --port /dev/ttyUSB0 --high-speed --tare --duration 10
 #+END_SRC
 
 * Installation
@@ -413,7 +441,7 @@ exit
         (url "https://git.savannah.gnu.org/git/guix.git")
         (branch "master")
         (commit
-          "de2729bd962616c86c4a3c1c29a1eb9cfd7ab199")
+          "de4675d5588ad04657823780a55a6392147c0178")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"
@@ -669,7 +697,7 @@ install_requires =
 
 [options.entry_points]
 console_scripts =
-    <<command-line-interface>> = <<python-package-name>>.cli:main
+    <<command-line-interface>> = <<python-package-name>>.cli:cli
 #+END_SRC
 
 #+HEADER: :tangle (if tangle-external-files "../setup.py" "no")
@@ -713,7 +741,7 @@ from <<python-package-name>>.__about__ import (
     __url__,
     __version__)
 
-from .<<python-package-name>> import LoadstarSensorsInterface, test
+from .<<python-package-name>> import LoadstarSensorsInterface
 #+END_SRC
 
 #+NAME: license-text

@@ -4,7 +4,7 @@
     "license": "https://spdx.org/licenses/BSD-3-Clause",
     "codeRepository": "git+https://github.com/janelia-pypi/loadstar_sensors_interface_python.git",
     "dateCreated": "2022-08-16",
-    "dateModified": "2023-01-30",
+    "dateModified": "2023-01-31",
     "name": "loadstar_sensors_interface",
     "version": "1.0.0",
     "description": "Python async interface to Loadstar Sensors USB devices.",

@@ -1,6 +1,7 @@
 """Python interface to Loadstar Sensors USB devices."""
 import asyncio
 import serial_asyncio
+from time import perf_counter
 
 
 async def sensor_value_callback(sensor_value):
@@ -26,16 +27,22 @@ class LoadstarSensorsInterface():
         self._read_lock = asyncio.Lock()
         self._write_read_lock = asyncio.Lock()
         self._port = None
+        self._baudrate = None
         self._reader = None
         self._writer = None
         self._getting_sensor_values = False
-        self._sensor_value_count = 0
         self._getting_sensor_values_task = None
+        self._sensor_value_count = 0
+        self._sensor_value_t_start = 0
+        self._sensor_value_t_stop = 0
+        self._sensor_value_duration = 1
+        self._sensor_value_rate = 0
         self._debug_print('LoadstarSensorsInterface initialized')
 
     async def _open_serial_connection(self, port, baudrate):
         """ """
         self._port = port
+        self._baudrate = baudrate
         self._reader, self._writer = await serial_asyncio.open_serial_connection(url=port, baudrate=baudrate)
         self._debug_print(f'serial connection opened with port: {port}, baudrate: {baudrate}')
         await self._read_until_no_response()
@@ -101,6 +108,7 @@ class LoadstarSensorsInterface():
 
     async def _getting_sensor_values_loop(self, callback):
         self._sensor_value_count = 0
+        self._sensor_value_t_start = perf_counter()
         await self._write(b'wc')
         try:
             while True:
@@ -124,13 +132,26 @@ class LoadstarSensorsInterface():
         await self._write()
         await asyncio.sleep(0.05)
         self._getting_sensor_values_task.cancel()
+        self._sensor_value_t_stop = perf_counter()
+        self._sensor_value_duration = self._sensor_value_t_stop - self._sensor_value_t_start
+        self._sensor_value_rate = self._sensor_value_count / self._sensor_value_duration
         await self._read_until_no_response()
         self._getting_sensor_values = False
+
+    def get_sensor_value_count(self):
+        return self._sensor_value_count
+
+    def get_sensor_value_duration(self):
+        return self._sensor_value_duration
+
+    def get_sensor_value_rate(self):
+        return self._sensor_value_rate
 
     async def get_device_info(self):
         """Query device and return information."""
         device_info = {}
         device_info['port'] = self.get_port()
+        device_info['baudrate'] = self.get_baudrate()
         device_info['model'] = await self.get_model()
         device_info['id'] = await self.get_id()
         device_info['native_units'] = await self.get_native_units()
@@ -186,6 +207,10 @@ class LoadstarSensorsInterface():
         """Sensor device name."""
         return self._port
 
+    def get_baudrate(self):
+        """Sensor device port baudrate."""
+        return self._baudrate
+
     async def get_model(self):
         """Sensor device model."""
         response = await self._write_read(b'model')
@@ -214,22 +239,3 @@ class LoadstarSensorsInterface():
         if self._debug:
             print(to_print)
 
-async def test():
-    dev = LoadstarSensorsInterface(debug=True)
-    await dev.open_high_speed_serial_connection(port='/dev/ttyUSB0')
-    await dev.print_device_info()
-    await asyncio.sleep(2)
-    task = asyncio.create_task(dev.start_getting_sensor_values())
-    await asyncio.sleep(4)
-    await dev.stop_getting_sensor_values()
-    await task
-    for _ in range(2):
-        await dev.get_sensor_value()
-        await asyncio.sleep(1)
-    for _ in range(2):
-        await dev.get_adc_value()
-        await asyncio.sleep(1)
-    await dev.print_device_info()
-
-if __name__ == '__main__':
-    asyncio.run(test())
