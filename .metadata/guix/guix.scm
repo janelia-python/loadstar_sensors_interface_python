@@ -39,6 +39,7 @@
     (propagated-inputs (list
                         ncurses
                         python-pyserial-asyncio
+                        python-pint
                         python-click))
     (home-page "")
     (synopsis "")

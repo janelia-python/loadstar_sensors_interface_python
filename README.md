@@ -1,21 +1,21 @@
-- [About](#org212cbee)
-- [Example Usage](#orgdf5ad2a)
-- [Installation](#orgc577921)
-- [Development](#org7151bd5)
+- [About](#orgf17de4b)
+- [Example Usage](#orgca78427)
+- [Installation](#org535d571)
+- [Development](#orga1f7467)
 
     <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="org212cbee"></a>
+<a id="orgf17de4b"></a>
 
 # About
 
 ```markdown
 - Python Package Name: loadstar_sensors_interface
 - Description: Python async interface to Loadstar Sensors USB devices.
-- Version: 1.0.0
-- Release Date: 2023-02-01
+- Version: 1.1.0
+- Release Date: 2023-02-02
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -24,16 +24,19 @@
 - Copyright: 2023 Howard Hughes Medical Institute
 - References:
   - https://pyserial-asyncio.readthedocs.io/en/latest/
+  - https://python.readthedocs.io/en/latest/library/asyncio.html
+  - https://pint.readthedocs.io/en/stable/getting/overview.html
   - https://tinkering.xyz/async-serial/
   - https://www.loadstarsensors.com/
   - https://www.loadstarsensors.com/di-100u-di-1000u-command-set.html
 - Dependencies:
   - pyserial-asyncio
+  - pint
   - click
 ```
 
 
-<a id="orgdf5ad2a"></a>
+<a id="orgca78427"></a>
 
 # Example Usage
 
@@ -45,20 +48,21 @@ from loadstar_sensors_interface import LoadstarSensorsInterface
 import asyncio
 
 async def my_sensor_value_callback(sensor_value):
-    print(f'my_sensor_value_callback: {sensor_value}')
+    print(f'my_sensor_value_callback: {sensor_value:.1f}')
     await asyncio.sleep(0)
 
 async def example():
     dev = LoadstarSensorsInterface()
     await dev.open_high_speed_serial_connection(port='/dev/ttyUSB0')
+    dev.set_output_units(dev.units.gram)
     await dev.tare()
     dev.start_getting_sensor_values(my_sensor_value_callback)
-    await asyncio.sleep(4)
+    await asyncio.sleep(5)
     await dev.stop_getting_sensor_values()
     count = dev.get_sensor_value_count()
     duration = dev.get_sensor_value_duration()
     rate = dev.get_sensor_value_rate()
-    print(f'{count} sensor values in {duration}s at a rate of {rate}Hz')
+    print(f'{count} sensor values in {duration:.1f}s at a rate of {rate:.1f}Hz')
     await dev.print_device_info()
 
 asyncio.run(example())
@@ -111,7 +115,7 @@ loadstar --port /dev/ttyUSB0 --high-speed --tare --duration 10
 ```
 
 
-<a id="orgc577921"></a>
+<a id="org535d571"></a>
 
 # Installation
 
@@ -207,7 +211,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="org7151bd5"></a>
+<a id="orga1f7467"></a>
 
 # Development
 

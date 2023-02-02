@@ -26,7 +26,7 @@ python-loadstar-sensors-interface
 
 #+NAME: version
 #+BEGIN_SRC text :exports none :noweb yes
-1.0.0
+1.1.0
 #+END_SRC
 
 #+NAME: description
@@ -37,12 +37,14 @@ Python async interface to Loadstar Sensors USB devices.
 #+NAME: python-dependencies
 #+BEGIN_SRC text :exports none :noweb yes
 pyserial-asyncio
+pint
 click
 #+END_SRC
 
 #+NAME: guix-dependencies
 #+BEGIN_SRC text :exports none :noweb yes
 python-pyserial-asyncio
+python-pint
 python-click
 #+END_SRC
 
@@ -54,6 +56,8 @@ loadstar
 #+NAME: references
 #+BEGIN_SRC text :exports none :noweb yes
 https://pyserial-asyncio.readthedocs.io/en/latest/
+https://python.readthedocs.io/en/latest/library/asyncio.html
+https://pint.readthedocs.io/en/stable/getting/overview.html
 https://tinkering.xyz/async-serial/
 https://www.loadstarsensors.com/
 https://www.loadstarsensors.com/di-100u-di-1000u-command-set.html
@@ -179,20 +183,21 @@ from loadstar_sensors_interface import LoadstarSensorsInterface
 import asyncio
 
 async def my_sensor_value_callback(sensor_value):
-    print(f'my_sensor_value_callback: {sensor_value}')
+    print(f'my_sensor_value_callback: {sensor_value:.1f}')
     await asyncio.sleep(0)
 
 async def example():
     dev = LoadstarSensorsInterface()
     await dev.open_high_speed_serial_connection(port='/dev/ttyUSB0')
+    dev.set_output_units(dev.units.gram)
     await dev.tare()
     dev.start_getting_sensor_values(my_sensor_value_callback)
-    await asyncio.sleep(4)
+    await asyncio.sleep(5)
     await dev.stop_getting_sensor_values()
     count = dev.get_sensor_value_count()
     duration = dev.get_sensor_value_duration()
     rate = dev.get_sensor_value_rate()
-    print(f'{count} sensor values in {duration}s at a rate of {rate}Hz')
+    print(f'{count} sensor values in {duration:.1f}s at a rate of {rate:.1f}Hz')
     await dev.print_device_info()
 
 asyncio.run(example())
@@ -441,7 +446,7 @@ exit
         (url "https://git.savannah.gnu.org/git/guix.git")
         (branch "master")
         (commit
-          "de4675d5588ad04657823780a55a6392147c0178")
+          "f5446f721121c50a6e8fdf1e7285d861dfd180b8")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"
@@ -452,7 +457,7 @@ exit
         (url "https://github.com/guix-janelia/guix-janelia.git")
         (branch "main")
         (commit
-          "a082913f2dcfd0aa7d1922e780880505aaf3e2d9")))
+          "d6dbb84511be2be05236e689538c5f58db81a222")))
 #+END_SRC
 
 #+BEGIN_SRC scheme :tangle guix/guix.scm :exports none :noweb yes
