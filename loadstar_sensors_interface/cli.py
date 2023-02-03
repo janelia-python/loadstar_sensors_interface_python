@@ -35,19 +35,31 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               default=10,
               show_default=True,
               help='Duration of sensor value measurements in seconds.')
+@click.option('-u', '--units',
+              default='gram',
+              show_default=True,
+              help='Sensor value units.')
+@click.option('-f', '--units-format',
+              default='.1f',
+              show_default=True,
+              help='Units format.')
 def cli(port,
         high_speed,
         debug,
         info,
         tare,
-        duration):
+        duration,
+        units,
+        units_format):
     """Command line interface for loadstar sensors."""
     asyncio.run(main(port,
                      high_speed,
                      debug,
                      info,
                      tare,
-                     duration))
+                     duration,
+                     units,
+                     units_format))
 
 
 async def sensor_value_callback(sensor_value):
@@ -60,12 +72,17 @@ async def main(port,
                debug,
                info,
                tare,
-               duration):
+               duration,
+               units,
+               units_format):
     dev = LoadstarSensorsInterface(debug=debug)
     if high_speed:
         await dev.open_high_speed_serial_connection(port=port)
     else:
         await dev.open_low_speed_serial_connection(port=port)
+
+    dev.set_sensor_value_units(units)
+    dev.set_units_format(units_format)
 
     # clear_screen()
     await dev.print_device_info()
@@ -92,7 +109,8 @@ async def main(port,
     count = dev.get_sensor_value_count()
     duration = dev.get_sensor_value_duration()
     rate = dev.get_sensor_value_rate()
-    print(f'{count} sensor values in {duration:.2f}s at a rate of {rate:.1f}Hz')
+    print(f'{count} sensor values in {duration} at a rate of {rate}')
+    await dev.print_device_info()
 
 
 def clear_screen():

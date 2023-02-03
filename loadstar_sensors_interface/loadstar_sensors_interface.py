@@ -40,7 +40,10 @@ class LoadstarSensorsInterface():
         self._sensor_value_duration = 1
         self._sensor_value_rate = 0
         self._native_units = self.units.lb
-        self._output_units = self.units.gram
+        self._sensor_value_units = self.units.gram
+        self._duration_units = self.units.second
+        self._rate_units = self.units.hertz
+        self.units.default_format = '.1f'
         self._debug_print('LoadstarSensorsInterface initialized')
 
     async def _open_serial_connection(self, port, baudrate):
@@ -142,7 +145,9 @@ class LoadstarSensorsInterface():
         self._getting_sensor_values_task.cancel()
         self._sensor_value_t_stop = time.perf_counter()
         self._sensor_value_duration = self._sensor_value_t_stop - self._sensor_value_t_start
+        self._sensor_value_duration *= self._duration_units
         self._sensor_value_rate = self._sensor_value_count / self._sensor_value_duration
+        self._sensor_value_rate = self._sensor_value_rate.to(self._rate_units)
         await self._read_until_no_response()
         self._getting_sensor_values = False
 
@@ -165,7 +170,8 @@ class LoadstarSensorsInterface():
         device_info['baudrate'] = self.get_baudrate()
         device_info['model'] = await self.get_model()
         device_info['id'] = await self.get_id()
-        device_info['output_units'] = self.get_output_units()
+        device_info['sensor_value_units'] = self.get_sensor_value_units()
+        device_info['units_format'] = self.get_units_format()
         device_info['load_capacity'] = await self.get_load_capacity()
         return device_info
 
@@ -175,10 +181,7 @@ class LoadstarSensorsInterface():
         device_info.update(additional_device_info)
         print('device info:')
         for key, value in device_info.items():
-            if type(value) == type(1.0 * self._output_units):
-                print(f'{key:<25}{value:.2f}')
-            else:
-                print(f'{key:<25}{value}')
+            print(f'{key:<25}{value}')
         print('')
 
     async def tare(self):
@@ -247,24 +250,30 @@ class LoadstarSensorsInterface():
             raise RuntimeError(f'get_native_units: {response} is not equal to LB, Kg, or N!')
         return response
 
-    def get_output_units(self):
-        """Sensor value output units."""
-        return self._output_units
+    def get_sensor_value_units(self):
+        """Sensor value units."""
+        return self._sensor_value_units
 
-    def set_output_units(self, output_units):
-        """Set sensor value output units."""
-        if not type(output_units) == type(self._native_units):
-            raise RuntimeError('output_units must be of type(LoadstarSensorsInterface.units)!')
-        # check to see if native units can be converted to output_units
-        (1 * self._native_units).to(output_units)
-        self._output_units = output_units
-        return self._output_units
+    def set_sensor_value_units(self, sensor_value_units):
+        """Set sensor value units."""
+        # check to see if native units can be converted to sensor_value_units
+        (1 * self._native_units).to(sensor_value_units)
+        self._sensor_value_units = sensor_value_units
+        return self._sensor_value_units
+
+    def set_units_format(self, units_format):
+        """Set units format."""
+        self.units.default_format = units_format
+
+    def get_units_format(self):
+        """get units format."""
+        return self.units.default_format
 
     def _convert_response_to_sensor_value(self, response):
         """Convert response to fload then convert from native to output units."""
         sensor_value = float(response)
         sensor_value = sensor_value * self._native_units
-        sensor_value = sensor_value.to(self._output_units)
+        sensor_value = sensor_value.to(self._sensor_value_units)
         return sensor_value
 
     async def get_load_capacity(self):

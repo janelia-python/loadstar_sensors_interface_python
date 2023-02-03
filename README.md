@@ -1,21 +1,21 @@
-- [About](#orgf17de4b)
-- [Example Usage](#orgca78427)
-- [Installation](#org535d571)
-- [Development](#orga1f7467)
+- [About](#orgf9d626e)
+- [Example Usage](#org0cb2803)
+- [Installation](#org6f92998)
+- [Development](#org4f4118f)
 
     <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="orgf17de4b"></a>
+<a id="orgf9d626e"></a>
 
 # About
 
 ```markdown
 - Python Package Name: loadstar_sensors_interface
 - Description: Python async interface to Loadstar Sensors USB devices.
-- Version: 1.1.0
-- Release Date: 2023-02-02
+- Version: 2.0.0
+- Release Date: 2023-02-03
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -36,7 +36,7 @@
 ```
 
 
-<a id="orgca78427"></a>
+<a id="org0cb2803"></a>
 
 # Example Usage
 
@@ -48,13 +48,14 @@ from loadstar_sensors_interface import LoadstarSensorsInterface
 import asyncio
 
 async def my_sensor_value_callback(sensor_value):
-    print(f'my_sensor_value_callback: {sensor_value:.1f}')
+    print(f'my_sensor_value_callback: {sensor_value}')
     await asyncio.sleep(0)
 
 async def example():
     dev = LoadstarSensorsInterface()
     await dev.open_high_speed_serial_connection(port='/dev/ttyUSB0')
-    dev.set_output_units(dev.units.gram)
+    dev.set_sensor_value_units('gram')
+    dev.set_units_format('.1f')
     await dev.tare()
     dev.start_getting_sensor_values(my_sensor_value_callback)
     await asyncio.sleep(5)
@@ -62,7 +63,7 @@ async def example():
     count = dev.get_sensor_value_count()
     duration = dev.get_sensor_value_duration()
     rate = dev.get_sensor_value_rate()
-    print(f'{count} sensor values in {duration:.1f}s at a rate of {rate:.1f}Hz')
+    print(f'{count} sensor values in {duration} at a rate of {rate}')
     await dev.print_device_info()
 
 asyncio.run(example())
@@ -81,15 +82,17 @@ loadstar --help
 #   Command line interface for loadstar sensors.
 
 # Options:
-#   -p, --port TEXT         Device name (e.g. /dev/ttyUSB0 on GNU/Linux or COM3
-#                           on Windows)
-#   -H, --high-speed        Open serial port with high speed baudrate.
-#   -d, --debug             Print debugging information.
-#   -i, --info              Print the device info and exit
-#   -T, --tare              Tare before getting sensor values.
-#   -d, --duration INTEGER  Duration of sensor value measurements in seconds.
-#                           [default: 10]
-#   -h, --help              Show this message and exit.
+#   -p, --port TEXT          Device name (e.g. /dev/ttyUSB0 on GNU/Linux or COM3
+#                            on Windows)
+#   -H, --high-speed         Open serial port with high speed baudrate.
+#   -d, --debug              Print debugging information.
+#   -i, --info               Print the device info and exit
+#   -T, --tare               Tare before getting sensor values.
+#   -d, --duration INTEGER   Duration of sensor value measurements in seconds.
+#                            [default: 10]
+#   -u, --units TEXT         Sensor value units.  [default: gram]
+#   -f, --units-format TEXT  Units format.  [default: .1f]
+#   -h, --help               Show this message and exit.
 ```
 
 
@@ -101,6 +104,14 @@ loadstar --port /dev/ttyUSB0 --info
 
 # DI-1000UHS
 loadstar --port /dev/ttyUSB0 --high-speed --info
+# device info:
+# port                     /dev/ttyUSB0
+# baudrate                 230400
+# model                    FCM DI-1000
+# id                       F230235995
+# sensor_value_units       gram
+# units_format             .1f
+# load_capacity            2041.2 gram
 ```
 
 
@@ -108,14 +119,33 @@ loadstar --port /dev/ttyUSB0 --high-speed --info
 
 ```sh
 # DI-100, DI-1000
-loadstar --port /dev/ttyUSB0 --tare --duration 10
+loadstar --port /dev/ttyUSB0 --tare --duration 10 --units kilogram --units-format=.3f
 
 # DI-1000UHS
-loadstar --port /dev/ttyUSB0 --high-speed --tare --duration 10
+loadstar --port /dev/ttyUSB0 --high-speed --tare --duration 10 --units kilogram --units-format=.3f
+# 2023-02-03 18:35:11.086982 - sensor_value -> 0.500 kilogram
+# 2023-02-03 18:35:11.087548 - sensor_value -> 0.500 kilogram
+# 2023-02-03 18:35:11.088130 - sensor_value -> 0.500 kilogram
+# 2023-02-03 18:35:11.088705 - sensor_value -> 0.500 kilogram
+# 2023-02-03 18:35:11.089174 - sensor_value -> 0.500 kilogram
+# 2023-02-03 18:35:11.089540 - sensor_value -> 0.500 kilogram
+# 2023-02-03 18:35:11.089905 - sensor_value -> 0.500 kilogram
+# 2023-02-03 18:35:11.090268 - sensor_value -> 0.500 kilogram
+# 2023-02-03 18:35:11.090634 - sensor_value -> 0.500 kilogram
+# 2023-02-03 18:35:11.091001 - sensor_value -> 0.500 kilogram
+# 5166 sensor values in 10.051 second at a rate of 513.980 hertz
+# device info:
+# port                     /dev/ttyUSB0
+# baudrate                 230400
+# model                    FCM DI-1000
+# id                       F230235995
+# sensor_value_units       kilogram
+# units_format             .3f
+# load_capacity            2.041 kilogram
 ```
 
 
-<a id="org535d571"></a>
+<a id="org6f92998"></a>
 
 # Installation
 
@@ -211,7 +241,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="orga1f7467"></a>
+<a id="org4f4118f"></a>
 
 # Development
 
