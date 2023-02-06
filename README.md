@@ -1,13 +1,13 @@
-- [About](#orgf9d626e)
-- [Example Usage](#org0cb2803)
-- [Installation](#org6f92998)
-- [Development](#org4f4118f)
+- [About](#orgb079dfc)
+- [Example Usage](#orgc218588)
+- [Installation](#org9083e41)
+- [Development](#orgb3f52b3)
 
     <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="orgf9d626e"></a>
+<a id="orgb079dfc"></a>
 
 # About
 
@@ -15,7 +15,7 @@
 - Python Package Name: loadstar_sensors_interface
 - Description: Python async interface to Loadstar Sensors USB devices.
 - Version: 2.0.0
-- Release Date: 2023-02-03
+- Release Date: 2023-02-06
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -36,7 +36,7 @@
 ```
 
 
-<a id="org0cb2803"></a>
+<a id="orgc218588"></a>
 
 # Example Usage
 
@@ -145,7 +145,7 @@ loadstar --port /dev/ttyUSB0 --high-speed --tare --duration 10 --units kilogram 
 ```
 
 
-<a id="org6f92998"></a>
+<a id="org9083e41"></a>
 
 # Installation
 
@@ -241,7 +241,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="org4f4118f"></a>
+<a id="orgb3f52b3"></a>
 
 # Development
 
@@ -283,7 +283,7 @@ source .metadata/.alias
 ## Test Python package using ipython shell
 
 ```sh
-,make ipython-shell
+,make guix-dev-container-ipython
 import loadstar_sensors_interface
 exit
 ```
@@ -292,7 +292,7 @@ exit
 ## Test installation of Guix package
 
 ```sh
-,make installed-shell
+,make guix-container-installed
 exit
 ```
 
@@ -312,8 +312,8 @@ exit
 DI-100, DI-1000
 
 ```sh
-,make serial-shell # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 serial-shell
+,make guix-dev-container-port-serial # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 guix-dev-container-port-serial
 ? # help
 settings
 [C-a][C-x] # to exit
@@ -325,8 +325,8 @@ settings
 DI-1000UHS
 
 ```sh
-,make serial-shell-hs # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 serial-shell-hs
+,make guix-dev-container-port-serial-hs # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 guix-dev-container-port-serial-hs
 ? # help
 settings
 [C-a][C-x] # to exit
@@ -336,8 +336,8 @@ settings
 ## Test Python package using ipython shell and serial port
 
 ```sh
-,make ipython-shell-port # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 ipython-shell-port
+,make guix-dev-container-port-ipython # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 guix-dev-container-port-ipython
 import loadstar_sensors_interface
 exit
 ```
@@ -346,7 +346,7 @@ exit
 ## Test installation of Guix package and serial port
 
 ```sh
-,make installed-shell-port # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 installed-shell-port
+,make guix-container-port-installed # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 guix-container-port-installed
 exit
 ```

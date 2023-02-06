@@ -12,17 +12,18 @@ GUIX-DEV-SHELL = $(GUIX-TIME-MACHINE) -- shell -D -f $(MAKEFILE_DIR)/guix/guix.s
 CONTAINER = --container --preserve='^DISPLAY$$' --preserve='^TERM$$'
 GUIX-CONTAINER = $(GUIX-SHELL) $(CONTAINER)
 GUIX-DEV-CONTAINER = $(GUIX-DEV-SHELL) $(CONTAINER)
+VENV-SHELL = rm -rf .venv; mkdir .venv; python3 -m venv .venv; source .venv/bin/activate
 
 .PHONY: guix-dev-container
 guix-dev-container:
 	$(GUIX-DEV-CONTAINER)
 
-.PHONY: ipython-shell
-ipython-shell:
-	$(GUIX-DEV-CONTAINER) -- ipython
+.PHONY: guix-dev-container-ipython
+guix-dev-container-ipython:
+	$(GUIX-DEV-CONTAINER) -- ipython --no-autoindent
 
-.PHONY: installed-shell
-installed-shell:
+.PHONY: guix-container-installed
+guix-container-installed:
 	$(GUIX-CONTAINER) python-ipython --rebuild-cache
 
 .PHONY: metadata-edits
@@ -30,7 +31,7 @@ metadata-edits:
 	$(GUIX-DEV-CONTAINER) -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l $(MAKEFILE_DIR)/emacs/init.el --file $(MAKEFILE_DIR)/metadata.org"
 
 .PHONY: metadata
-metadata:
+metadata: requirements.txt
 	$(GUIX-DEV-CONTAINER) -- sh -c "emacs --batch -Q  -l $(MAKEFILE_DIR)/emacs/init.el --eval '(process-org \"$(MAKEFILE_DIR)/metadata.org\")'"
 
 .PHONY: package
@@ -49,26 +50,34 @@ add:
 clean:
 	$(GUIX-DEV-CONTAINER) -- sh -c "git clean -xdf"
 
+.PHONY: requirements.txt
+requirements.txt:
+	$(GUIX-DEV-CONTAINER) -- $(VENV-SHELL);\
+	pip install loadstar_sensors_interface;\
+	pip freeze --exclude loadstar_sensors_interface > requirements.txt;\
+	deactivate;\
+	rm -rf .venv
+
 PORT = /dev/ttyUSB0
 GUIX-CONTAINER-PORT = $(GUIX-SHELL) $(CONTAINER) --expose=$(PORT)
 GUIX-DEV-CONTAINER-PORT = $(GUIX-DEV-SHELL) $(CONTAINER) --expose=$(PORT)
 
-.PHONY: serial-shell
-serial-shell:
+.PHONY: guix-dev-container-port-serial
+guix-dev-container-port-serial:
 	$(GUIX-DEV-CONTAINER-PORT) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
 
-.PHONY: serial-shell-hs
-serial-shell-hs:
+.PHONY: guix-dev-container-port-serial-hs
+guix-dev-container-port-serial-hs:
 	$(GUIX-DEV-CONTAINER-PORT) picocom -- picocom -b 230400 -f n -y n -d 8 -p 1 -c $(PORT)
 
-.PHONY: ipython-shell-port
-ipython-shell-port:
-	$(GUIX-DEV-CONTAINER-PORT) -- ipython
+.PHONY: guix-dev-container-port-ipython
+guix-dev-container-port-ipython:
+	$(GUIX-DEV-CONTAINER-PORT) -- ipython --no-autoindent
 
-.PHONY: installed-shell-port
-installed-shell-port:
+.PHONY: guix-container-port-installed
+guix-container-port-installed:
 	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache
 
-.PHONY: installed-ipython-shell-port
-installed-ipython-shell-port:
-	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache -- ipython
+.PHONY: guix-container-port-installed-ipython
+guix-container-port-installed-ipython:
+	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache -- ipython --no-autoindent

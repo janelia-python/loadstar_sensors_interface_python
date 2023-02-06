@@ -405,7 +405,7 @@ source .metadata/.alias
 ** Test Python package using ipython shell
 
 #+BEGIN_SRC sh :noweb yes
-,make ipython-shell
+,make guix-dev-container-ipython
 import <<python-package-name>>
 exit
 #+END_SRC
@@ -413,7 +413,7 @@ exit
 ** Test installation of Guix package
 
 #+BEGIN_SRC sh :noweb yes
-,make installed-shell
+,make guix-container-installed
 exit
 #+END_SRC
 
@@ -430,8 +430,8 @@ exit
 DI-100, DI-1000
 
 #+BEGIN_SRC sh :noweb yes
-,make serial-shell # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 serial-shell
+,make guix-dev-container-port-serial # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 guix-dev-container-port-serial
 ? # help
 settings
 [C-a][C-x] # to exit
@@ -442,8 +442,8 @@ settings
 DI-1000UHS
 
 #+BEGIN_SRC sh :noweb yes
-,make serial-shell-hs # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 serial-shell-hs
+,make guix-dev-container-port-serial-hs # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 guix-dev-container-port-serial-hs
 ? # help
 settings
 [C-a][C-x] # to exit
@@ -452,8 +452,8 @@ settings
 ** Test Python package using ipython shell and serial port
 
 #+BEGIN_SRC sh :noweb yes
-,make ipython-shell-port # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 ipython-shell-port
+,make guix-dev-container-port-ipython # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 guix-dev-container-port-ipython
 import <<python-package-name>>
 exit
 #+END_SRC
@@ -461,8 +461,8 @@ exit
 ** Test installation of Guix package and serial port
 
 #+BEGIN_SRC sh :noweb yes
-,make installed-shell-port # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 installed-shell-port
+,make guix-container-port-installed # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 guix-container-port-installed
 exit
 #+END_SRC
 
@@ -476,7 +476,7 @@ exit
         (url "https://git.savannah.gnu.org/git/guix.git")
         (branch "master")
         (commit
-          "a60c750eec73a2030b08b32af3b9f435c7ecca54")
+          "a582d863465990642d331bc05bf073f47fb80908")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"
@@ -564,17 +564,18 @@ GUIX-DEV-SHELL = $(GUIX-TIME-MACHINE) -- shell -D -f $(MAKEFILE_DIR)/guix/guix.s
 CONTAINER = --container --preserve='^DISPLAY$$' --preserve='^TERM$$'
 GUIX-CONTAINER = $(GUIX-SHELL) $(CONTAINER)
 GUIX-DEV-CONTAINER = $(GUIX-DEV-SHELL) $(CONTAINER)
+VENV-SHELL = rm -rf .venv; mkdir .venv; python3 -m venv .venv; source .venv/bin/activate
 
 .PHONY: guix-dev-container
 guix-dev-container:
 	$(GUIX-DEV-CONTAINER)
 
-.PHONY: ipython-shell
-ipython-shell:
-	$(GUIX-DEV-CONTAINER) -- ipython
+.PHONY: guix-dev-container-ipython
+guix-dev-container-ipython:
+	$(GUIX-DEV-CONTAINER) -- ipython --no-autoindent
 
-.PHONY: installed-shell
-installed-shell:
+.PHONY: guix-container-installed
+guix-container-installed:
 	$(GUIX-CONTAINER) python-ipython --rebuild-cache
 
 .PHONY: metadata-edits
@@ -582,7 +583,7 @@ metadata-edits:
 	$(GUIX-DEV-CONTAINER) -- sh -c "emacs -q --no-site-file --no-site-lisp --no-splash -l $(MAKEFILE_DIR)/emacs/init.el --file $(MAKEFILE_DIR)/metadata.org"
 
 .PHONY: metadata
-metadata:
+metadata: requirements.txt
 	$(GUIX-DEV-CONTAINER) -- sh -c "emacs --batch -Q  -l $(MAKEFILE_DIR)/emacs/init.el --eval '(process-org \"$(MAKEFILE_DIR)/metadata.org\")'"
 
 .PHONY: package
@@ -601,29 +602,37 @@ add:
 clean:
 	$(GUIX-DEV-CONTAINER) -- sh -c "git clean -xdf"
 
+.PHONY: requirements.txt
+requirements.txt:
+	$(GUIX-DEV-CONTAINER) -- $(VENV-SHELL);\
+	pip install <<python-package-name>>;\
+	pip freeze --exclude <<python-package-name>> > requirements.txt;\
+	deactivate;\
+	rm -rf .venv
+
 PORT = /dev/ttyUSB0
 GUIX-CONTAINER-PORT = $(GUIX-SHELL) $(CONTAINER) --expose=$(PORT)
 GUIX-DEV-CONTAINER-PORT = $(GUIX-DEV-SHELL) $(CONTAINER) --expose=$(PORT)
 
-.PHONY: serial-shell
-serial-shell:
+.PHONY: guix-dev-container-port-serial
+guix-dev-container-port-serial:
 	$(GUIX-DEV-CONTAINER-PORT) picocom -- picocom -b 9600 -f n -y n -d 8 -p 1 -c $(PORT)
 
-.PHONY: serial-shell-hs
-serial-shell-hs:
+.PHONY: guix-dev-container-port-serial-hs
+guix-dev-container-port-serial-hs:
 	$(GUIX-DEV-CONTAINER-PORT) picocom -- picocom -b 230400 -f n -y n -d 8 -p 1 -c $(PORT)
 
-.PHONY: ipython-shell-port
-ipython-shell-port:
-	$(GUIX-DEV-CONTAINER-PORT) -- ipython
+.PHONY: guix-dev-container-port-ipython
+guix-dev-container-port-ipython:
+	$(GUIX-DEV-CONTAINER-PORT) -- ipython --no-autoindent
 
-.PHONY: installed-shell-port
-installed-shell-port:
+.PHONY: guix-container-port-installed
+guix-container-port-installed:
 	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache
 
-.PHONY: installed-ipython-shell-port
-installed-ipython-shell-port:
-	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache -- ipython
+.PHONY: guix-container-port-installed-ipython
+guix-container-port-installed-ipython:
+	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache -- ipython --no-autoindent
 #+END_SRC
 
 #+BEGIN_SRC scheme :tangle emacs/init.el :exports none :noweb yes
