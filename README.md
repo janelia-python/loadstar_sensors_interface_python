@@ -1,13 +1,13 @@
-- [About](#orgb079dfc)
-- [Example Usage](#orgc218588)
-- [Installation](#org9083e41)
-- [Development](#orgb3f52b3)
+- [About](#orge927b16)
+- [Example Usage](#orgc391df7)
+- [Installation](#orgcafb04d)
+- [Development](#org2c2f5ae)
 
     <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="orgb079dfc"></a>
+<a id="orge927b16"></a>
 
 # About
 
@@ -36,7 +36,7 @@
 ```
 
 
-<a id="orgc218588"></a>
+<a id="orgc391df7"></a>
 
 # Example Usage
 
@@ -145,7 +145,7 @@ loadstar --port /dev/ttyUSB0 --high-speed --tare --duration 10 --units kilogram 
 ```
 
 
-<a id="org9083e41"></a>
+<a id="orgcafb04d"></a>
 
 # Installation
 
@@ -241,7 +241,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="orgb3f52b3"></a>
+<a id="org2c2f5ae"></a>
 
 # Development
 
@@ -292,7 +292,7 @@ exit
 ## Test installation of Guix package
 
 ```sh
-,make guix-container-installed
+,make guix-container
 exit
 ```
 
@@ -346,7 +346,7 @@ exit
 ## Test installation of Guix package and serial port
 
 ```sh
-,make guix-container-port-installed # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 guix-container-port-installed
+,make guix-container-port # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 guix-container-port
 exit
 ```

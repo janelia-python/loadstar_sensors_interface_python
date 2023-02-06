@@ -413,7 +413,7 @@ exit
 ** Test installation of Guix package
 
 #+BEGIN_SRC sh :noweb yes
-,make guix-container-installed
+,make guix-container
 exit
 #+END_SRC
 
@@ -461,8 +461,8 @@ exit
 ** Test installation of Guix package and serial port
 
 #+BEGIN_SRC sh :noweb yes
-,make guix-container-port-installed # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 guix-container-port-installed
+,make guix-container-port # PORT=/dev/ttyUSB0
+# ,make PORT=/dev/ttyUSB1 guix-container-port
 exit
 #+END_SRC
 
@@ -540,7 +540,28 @@ exit
 python-dev-package
 #+END_SRC
 
-#+BEGIN_SRC text :tangle docker/Dockerfile :exports none :noweb yes
+#+BEGIN_SRC text :tangle docker/Dockerfile.dev :exports none :noweb yes
+# first stage
+FROM python:3.9-slim AS builder
+COPY requirements.txt .
+
+# install dependencies to the local user directory (eg. /root/.local)
+RUN pip install --user -r requirements.txt
+RUN pip install --user ipython
+
+# second unnamed stage
+FROM python:3.9-slim
+WORKDIR /code
+
+# copy only the dependencies installation from the 1st stage image
+COPY --from=builder /root/.local /root/.local
+COPY ./ .
+
+# update PATH environment variable
+ENV PATH=/root/.local/bin:$PATH
+ENV PYTHONPATH="$PYTHONPATH:/root/.local"
+
+CMD ["bash"]
 #+END_SRC
 
 #+BEGIN_SRC text :tangle .alias :exports none :noweb yes
@@ -565,6 +586,8 @@ CONTAINER = --container --preserve='^DISPLAY$$' --preserve='^TERM$$'
 GUIX-CONTAINER = $(GUIX-SHELL) $(CONTAINER)
 GUIX-DEV-CONTAINER = $(GUIX-DEV-SHELL) $(CONTAINER)
 VENV-SHELL = rm -rf .venv; mkdir .venv; python3 -m venv .venv; source .venv/bin/activate
+DOCKER-DEV-IMAGE = docker build -f $(MAKEFILE_DIR)/docker/Dockerfile.dev -t <<python-package-name>>-dev .
+DOCKER-DEV-CONTAINER = $(DOCKER-DEV-IMAGE); docker run -it <<python-package-name>>-dev
 
 .PHONY: guix-dev-container
 guix-dev-container:
@@ -574,9 +597,25 @@ guix-dev-container:
 guix-dev-container-ipython:
 	$(GUIX-DEV-CONTAINER) -- ipython --no-autoindent
 
-.PHONY: guix-container-installed
-guix-container-installed:
+.PHONY: guix-container
+guix-container:
 	$(GUIX-CONTAINER) python-ipython --rebuild-cache
+
+.PHONY: requirements.txt
+requirements.txt:
+	$(GUIX-DEV-CONTAINER) -- $(VENV-SHELL);\
+	pip install <<python-package-name>>;\
+	pip freeze --exclude <<python-package-name>> > requirements.txt;\
+	deactivate;\
+	rm -rf .venv
+
+.PHONY: docker-dev-container
+docker-dev-container:
+	$(DOCKER-DEV-CONTAINER)
+
+.PHONY: docker-dev-container-ipython
+docker-dev-container-ipython:
+	$(DOCKER-DEV-CONTAINER) ipython --no-autoindent
 
 .PHONY: metadata-edits
 metadata-edits:
@@ -602,14 +641,6 @@ add:
 clean:
 	$(GUIX-DEV-CONTAINER) -- sh -c "git clean -xdf"
 
-.PHONY: requirements.txt
-requirements.txt:
-	$(GUIX-DEV-CONTAINER) -- $(VENV-SHELL);\
-	pip install <<python-package-name>>;\
-	pip freeze --exclude <<python-package-name>> > requirements.txt;\
-	deactivate;\
-	rm -rf .venv
-
 PORT = /dev/ttyUSB0
 GUIX-CONTAINER-PORT = $(GUIX-SHELL) $(CONTAINER) --expose=$(PORT)
 GUIX-DEV-CONTAINER-PORT = $(GUIX-DEV-SHELL) $(CONTAINER) --expose=$(PORT)
@@ -626,13 +657,21 @@ guix-dev-container-port-serial-hs:
 guix-dev-container-port-ipython:
 	$(GUIX-DEV-CONTAINER-PORT) -- ipython --no-autoindent
 
-.PHONY: guix-container-port-installed
-guix-container-port-installed:
+.PHONY: guix-container-port
+guix-container-port:
 	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache
 
-.PHONY: guix-container-port-installed-ipython
-guix-container-port-installed-ipython:
+.PHONY: guix-container-port-ipython
+guix-container-port-ipython:
 	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache -- ipython --no-autoindent
+
+.PHONY: docker-container-port
+docker-container-port:
+	$(DOCKER-CONTAINER) --device=$(PORT):$(PORT)
+
+.PHONY: docker-container-port-ipython
+docker-container-port-ipython:
+	$(DOCKER-CONTAINER) --device=$(PORT):$(PORT) ipython --no-autoindent
 #+END_SRC
 
 #+BEGIN_SRC scheme :tangle emacs/init.el :exports none :noweb yes
