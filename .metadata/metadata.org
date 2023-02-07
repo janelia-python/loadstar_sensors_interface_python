@@ -34,6 +34,11 @@ python-loadstar-sensors-interface
 Python async interface to Loadstar Sensors USB devices.
 #+END_SRC
 
+#+NAME: python-version
+#+BEGIN_SRC text :exports none :noweb yes
+3.9
+#+END_SRC
+
 #+NAME: python-dependencies
 #+BEGIN_SRC text :exports none :noweb yes
 pyserial-asyncio
@@ -161,6 +166,7 @@ Python 3
 - Python Package Name: <<python-package-name>>
 - Description: <<description>>
 - Version: <<version>>
+- Python Version: <<python-version>>
 - Release Date: <<release-date>>
 - Creation Date: <<creation-date>>
 - License: <<license>>
@@ -373,10 +379,6 @@ pip install <<python-package-name>>
 
 * Development
 
-** Install Guix
-
-[[https://guix.gnu.org/manual/en/html_node/Binary-Installation.html][Install Guix]]
-
 ** Clone Repository
 
 #+BEGIN_SRC sh :noweb yes
@@ -384,87 +386,140 @@ git clone <<git-clone-url>>
 cd <<repository-name>>
 #+END_SRC
 
-** Make alias
+** Guix
+
+*** Install Guix
+
+[[https://guix.gnu.org/manual/en/html_node/Binary-Installation.html][Install Guix]]
+
+*** Edit metadata.org
 
 #+BEGIN_SRC sh :noweb yes
-source .metadata/.alias
+make -f .metadata/Makefile metadata-edits
 #+END_SRC
 
-** Edit metadata.org
+*** Tangle metadata.org
 
 #+BEGIN_SRC sh :noweb yes
-,make metadata-edits
+make -f .metadata/Makefile metadata
 #+END_SRC
 
-** Tangle metadata.org
+*** Develop Python package
 
 #+BEGIN_SRC sh :noweb yes
-,make metadata
+make -f .metadata/Makefile guix-dev-container
+exit
 #+END_SRC
 
-** Test Python package using ipython shell
+*** Test Python package using ipython shell
 
 #+BEGIN_SRC sh :noweb yes
-,make guix-dev-container-ipython
+make -f .metadata/Makefile guix-dev-container-ipython
 import <<python-package-name>>
 exit
 #+END_SRC
 
-** Test installation of Guix package
+*** Test Python package installation
 
 #+BEGIN_SRC sh :noweb yes
-,make guix-container
+make -f .metadata/Makefile guix-container
 exit
 #+END_SRC
 
-** Upload Python package to pypi
+*** Upload Python package to pypi
 
 #+BEGIN_SRC sh :noweb yes
-,make upload
+make -f .metadata/Makefile upload
 #+END_SRC
 
-** Test direct device interaction using serial terminal
+*** Test direct device interaction using serial terminal
 
-*** Low Speed
+**** Low Speed
 
 DI-100, DI-1000
 
 #+BEGIN_SRC sh :noweb yes
-,make guix-dev-container-port-serial # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 guix-dev-container-port-serial
+make -f .metadata/Makefile guix-dev-container-port-serial # PORT=/dev/ttyUSB0
+# make -f .metadata/Makefile PORT=/dev/ttyUSB1 guix-dev-container-port-serial
 ? # help
 settings
 [C-a][C-x] # to exit
 #+END_SRC
 
-*** High Speed
+**** High Speed
 
 DI-1000UHS
 
 #+BEGIN_SRC sh :noweb yes
-,make guix-dev-container-port-serial-hs # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 guix-dev-container-port-serial-hs
+make -f .metadata/Makefile guix-dev-container-port-serial-hs # PORT=/dev/ttyUSB0
+# make -f .metadata/Makefile PORT=/dev/ttyUSB1 guix-dev-container-port-serial-hs
 ? # help
 settings
 [C-a][C-x] # to exit
 #+END_SRC
 
-** Test Python package using ipython shell and serial port
+*** Test Python package using ipython shell with serial port access
 
 #+BEGIN_SRC sh :noweb yes
-,make guix-dev-container-port-ipython # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 guix-dev-container-port-ipython
+make -f .metadata/Makefile guix-dev-container-port-ipython # PORT=/dev/ttyUSB0
+# make -f .metadata/Makefile PORT=/dev/ttyUSB1 guix-dev-container-port-ipython
 import <<python-package-name>>
 exit
 #+END_SRC
 
-** Test installation of Guix package and serial port
+*** Test Python package installation with serial port access
 
 #+BEGIN_SRC sh :noweb yes
-,make guix-container-port # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 guix-container-port
+make -f .metadata/Makefile guix-container-port # PORT=/dev/ttyUSB0
+# make -f .metadata/Makefile PORT=/dev/ttyUSB1 guix-container-port
 exit
 #+END_SRC
+
+** Docker
+
+*** Install Docker Engine
+
+[[https://docs.docker.com/engine/]]
+
+*** Develop Python package
+
+#+BEGIN_SRC sh :noweb yes
+make -f .metadata/Makefile docker-dev-container
+exit
+#+END_SRC
+
+*** Test Python package using ipython shell
+
+#+BEGIN_SRC sh :noweb yes
+make -f .metadata/Makefile docker-dev-container-ipython
+import <<python-package-name>>
+exit
+#+END_SRC
+
+*** Test Python package installation
+
+#+BEGIN_SRC sh :noweb yes
+make -f .metadata/Makefile docker-container
+exit
+#+END_SRC
+
+*** Test Python package using ipython shell with serial port access
+
+#+BEGIN_SRC sh :noweb yes
+make -f .metadata/Makefile docker-dev-container-port-ipython # PORT=/dev/ttyUSB0
+# make -f .metadata/Makefile PORT=/dev/ttyUSB1 docker-dev-container-port-ipython
+import <<python-package-name>>
+exit
+#+END_SRC
+
+*** Test Python package installation with serial port access
+
+#+BEGIN_SRC sh :noweb yes
+make -f .metadata/Makefile docker-container-port # PORT=/dev/ttyUSB0
+# make -f .metadata/Makefile PORT=/dev/ttyUSB1 docker-container-port
+exit
+#+END_SRC
+
 
 * Tangled Files                                                    :noexport:
 
@@ -476,18 +531,12 @@ exit
         (url "https://git.savannah.gnu.org/git/guix.git")
         (branch "master")
         (commit
-          "a582d863465990642d331bc05bf073f47fb80908")
+          "9a0f840b383839bd3d02b7328cf4396783f2fd90")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"
             (openpgp-fingerprint
-              "BBB0 2DDF 2CEA F6A8 0D1D  E643 A2A0 6DF2 A33A 54FA"))))
-      (channel
-        (name 'guix-janelia)
-        (url "https://github.com/guix-janelia/guix-janelia.git")
-        (branch "main")
-        (commit
-          "d6dbb84511be2be05236e689538c5f58db81a222")))
+              "BBB0 2DDF 2CEA F6A8 0D1D  E643 A2A0 6DF2 A33A 54FA")))))
 #+END_SRC
 
 #+BEGIN_SRC scheme :tangle guix/guix.scm :exports none :noweb yes
@@ -506,9 +555,7 @@ exit
  (gnu packages python-xyz)
  (gnu packages imagemagick)
  (gnu packages version-control)
- (gnu packages ncurses)
- (guix-janelia packages python-janelia)
- (guix-janelia packages python-xyz))
+ (gnu packages ncurses))
 
 (define %source-dir (dirname (dirname (dirname (current-filename)))))
 
@@ -542,7 +589,7 @@ python-dev-package
 
 #+BEGIN_SRC text :tangle docker/Dockerfile.dev :exports none :noweb yes
 # first stage
-FROM python:3.9-slim AS builder
+FROM python:<<python-version>>-slim AS builder
 COPY requirements.txt .
 
 # install dependencies to the local user directory (eg. /root/.local)
@@ -550,8 +597,8 @@ RUN pip install --user -r requirements.txt
 RUN pip install --user ipython
 
 # second unnamed stage
-FROM python:3.9-slim
-WORKDIR /code
+FROM python:<<python-version>>-slim
+WORKDIR /<<repository-name>>
 
 # copy only the dependencies installation from the 1st stage image
 COPY --from=builder /root/.local /root/.local
@@ -559,7 +606,15 @@ COPY ./ .
 
 # update PATH environment variable
 ENV PATH=/root/.local/bin:$PATH
-ENV PYTHONPATH="$PYTHONPATH:/root/.local"
+
+CMD ["bash"]
+#+END_SRC
+
+#+BEGIN_SRC text :tangle docker/Dockerfile :exports none :noweb yes
+FROM <<python-package-name>>-dev
+WORKDIR /<<repository-name>>
+
+RUN pip install --user .
 
 CMD ["bash"]
 #+END_SRC
@@ -588,6 +643,8 @@ GUIX-DEV-CONTAINER = $(GUIX-DEV-SHELL) $(CONTAINER)
 VENV-SHELL = rm -rf .venv; mkdir .venv; python3 -m venv .venv; source .venv/bin/activate
 DOCKER-DEV-IMAGE = docker build -f $(MAKEFILE_DIR)/docker/Dockerfile.dev -t <<python-package-name>>-dev .
 DOCKER-DEV-CONTAINER = $(DOCKER-DEV-IMAGE); docker run -it <<python-package-name>>-dev
+DOCKER-IMAGE = $(DOCKER-DEV-IMAGE); docker build -f $(MAKEFILE_DIR)/docker/Dockerfile -t <<python-package-name>> .
+DOCKER-CONTAINER = $(DOCKER-IMAGE); docker run -it <<python-package-name>>
 
 .PHONY: guix-dev-container
 guix-dev-container:
@@ -604,7 +661,7 @@ guix-container:
 .PHONY: requirements.txt
 requirements.txt:
 	$(GUIX-DEV-CONTAINER) -- $(VENV-SHELL);\
-	pip install <<python-package-name>>;\
+	pip install .;\
 	pip freeze --exclude <<python-package-name>> > requirements.txt;\
 	deactivate;\
 	rm -rf .venv
@@ -616,6 +673,10 @@ docker-dev-container:
 .PHONY: docker-dev-container-ipython
 docker-dev-container-ipython:
 	$(DOCKER-DEV-CONTAINER) ipython --no-autoindent
+
+.PHONY: docker-container
+docker-container:
+	$(DOCKER-CONTAINER)
 
 .PHONY: metadata-edits
 metadata-edits:
@@ -642,8 +703,10 @@ clean:
 	$(GUIX-DEV-CONTAINER) -- sh -c "git clean -xdf"
 
 PORT = /dev/ttyUSB0
-GUIX-CONTAINER-PORT = $(GUIX-SHELL) $(CONTAINER) --expose=$(PORT)
 GUIX-DEV-CONTAINER-PORT = $(GUIX-DEV-SHELL) $(CONTAINER) --expose=$(PORT)
+GUIX-CONTAINER-PORT = $(GUIX-SHELL) $(CONTAINER) --expose=$(PORT)
+DOCKER-DEV-CONTAINER-PORT = $(DOCKER-DEV-IMAGE); docker run -it --device=$(PORT) <<python-package-name>>-dev
+DOCKER-CONTAINER-PORT = $(DOCKER-IMAGE); docker run -it --device=$(PORT) <<python-package-name>>
 
 .PHONY: guix-dev-container-port-serial
 guix-dev-container-port-serial:
@@ -661,17 +724,13 @@ guix-dev-container-port-ipython:
 guix-container-port:
 	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache
 
-.PHONY: guix-container-port-ipython
-guix-container-port-ipython:
-	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache -- ipython --no-autoindent
+.PHONY: docker-dev-container-port-ipython
+docker-dev-container-port-ipython:
+	$(DOCKER-DEV-CONTAINER-PORT) ipython --no-autoindent
 
 .PHONY: docker-container-port
 docker-container-port:
-	$(DOCKER-CONTAINER) --device=$(PORT):$(PORT)
-
-.PHONY: docker-container-port-ipython
-docker-container-port-ipython:
-	$(DOCKER-CONTAINER) --device=$(PORT):$(PORT) ipython --no-autoindent
+	$(DOCKER-CONTAINER-PORT)
 #+END_SRC
 
 #+BEGIN_SRC scheme :tangle emacs/init.el :exports none :noweb yes

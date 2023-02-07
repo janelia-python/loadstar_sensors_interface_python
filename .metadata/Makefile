@@ -15,6 +15,8 @@ GUIX-DEV-CONTAINER = $(GUIX-DEV-SHELL) $(CONTAINER)
 VENV-SHELL = rm -rf .venv; mkdir .venv; python3 -m venv .venv; source .venv/bin/activate
 DOCKER-DEV-IMAGE = docker build -f $(MAKEFILE_DIR)/docker/Dockerfile.dev -t loadstar_sensors_interface-dev .
 DOCKER-DEV-CONTAINER = $(DOCKER-DEV-IMAGE); docker run -it loadstar_sensors_interface-dev
+DOCKER-IMAGE = $(DOCKER-DEV-IMAGE); docker build -f $(MAKEFILE_DIR)/docker/Dockerfile -t loadstar_sensors_interface .
+DOCKER-CONTAINER = $(DOCKER-IMAGE); docker run -it loadstar_sensors_interface
 
 .PHONY: guix-dev-container
 guix-dev-container:
@@ -31,7 +33,7 @@ guix-container:
 .PHONY: requirements.txt
 requirements.txt:
 	$(GUIX-DEV-CONTAINER) -- $(VENV-SHELL);\
-	pip install loadstar_sensors_interface;\
+	pip install .;\
 	pip freeze --exclude loadstar_sensors_interface > requirements.txt;\
 	deactivate;\
 	rm -rf .venv
@@ -43,6 +45,10 @@ docker-dev-container:
 .PHONY: docker-dev-container-ipython
 docker-dev-container-ipython:
 	$(DOCKER-DEV-CONTAINER) ipython --no-autoindent
+
+.PHONY: docker-container
+docker-container:
+	$(DOCKER-CONTAINER)
 
 .PHONY: metadata-edits
 metadata-edits:
@@ -69,8 +75,10 @@ clean:
 	$(GUIX-DEV-CONTAINER) -- sh -c "git clean -xdf"
 
 PORT = /dev/ttyUSB0
-GUIX-CONTAINER-PORT = $(GUIX-SHELL) $(CONTAINER) --expose=$(PORT)
 GUIX-DEV-CONTAINER-PORT = $(GUIX-DEV-SHELL) $(CONTAINER) --expose=$(PORT)
+GUIX-CONTAINER-PORT = $(GUIX-SHELL) $(CONTAINER) --expose=$(PORT)
+DOCKER-DEV-CONTAINER-PORT = $(DOCKER-DEV-IMAGE); docker run -it --device=$(PORT) loadstar_sensors_interface-dev
+DOCKER-CONTAINER-PORT = $(DOCKER-IMAGE); docker run -it --device=$(PORT) loadstar_sensors_interface
 
 .PHONY: guix-dev-container-port-serial
 guix-dev-container-port-serial:
@@ -88,14 +96,10 @@ guix-dev-container-port-ipython:
 guix-container-port:
 	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache
 
-.PHONY: guix-container-port-ipython
-guix-container-port-ipython:
-	$(GUIX-CONTAINER-PORT) python-ipython --rebuild-cache -- ipython --no-autoindent
+.PHONY: docker-dev-container-port-ipython
+docker-dev-container-port-ipython:
+	$(DOCKER-DEV-CONTAINER-PORT) ipython --no-autoindent
 
 .PHONY: docker-container-port
 docker-container-port:
-	$(DOCKER-CONTAINER) --device=$(PORT):$(PORT)
-
-.PHONY: docker-container-port-ipython
-docker-container-port-ipython:
-	$(DOCKER-CONTAINER) --device=$(PORT):$(PORT) ipython --no-autoindent
+	$(DOCKER-CONTAINER-PORT)

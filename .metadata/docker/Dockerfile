@@ -1,21 +1,6 @@
-# first stage
-FROM python:3.9-slim AS builder
-COPY requirements.txt .
+FROM loadstar_sensors_interface-dev
+WORKDIR /loadstar_sensors_interface_python
 
-# install dependencies to the local user directory (eg. /root/.local)
-RUN pip install --user -r requirements.txt
-RUN pip install --user ipython
-
-# second unnamed stage
-FROM python:3.9-slim
-WORKDIR /code
-
-# copy only the dependencies installation from the 1st stage image
-COPY --from=builder /root/.local /root/.local
-COPY ./ .
-
-# update PATH environment variable
-ENV PATH=/root/.local/bin:$PATH
-ENV PYTHONPATH="$PYTHONPATH:/root/.local"
+RUN pip install --user .
 
 CMD ["bash"]

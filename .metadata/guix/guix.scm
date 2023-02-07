@@ -13,9 +13,7 @@
  (gnu packages python-xyz)
  (gnu packages imagemagick)
  (gnu packages version-control)
- (gnu packages ncurses)
- (guix-janelia packages python-janelia)
- (guix-janelia packages python-xyz))
+ (gnu packages ncurses))
 
 (define %source-dir (dirname (dirname (dirname (current-filename)))))
 

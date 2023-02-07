@@ -1,13 +1,13 @@
-- [About](#orge927b16)
-- [Example Usage](#orgc391df7)
-- [Installation](#orgcafb04d)
-- [Development](#org2c2f5ae)
+- [About](#org5991660)
+- [Example Usage](#org9d240dc)
+- [Installation](#org02d0117)
+- [Development](#org70fbaec)
 
     <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="orge927b16"></a>
+<a id="org5991660"></a>
 
 # About
 
@@ -15,7 +15,8 @@
 - Python Package Name: loadstar_sensors_interface
 - Description: Python async interface to Loadstar Sensors USB devices.
 - Version: 2.0.0
-- Release Date: 2023-02-06
+- Python Version: 3.9
+- Release Date: 2023-02-07
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -36,7 +37,7 @@
 ```
 
 
-<a id="orgc391df7"></a>
+<a id="org9d240dc"></a>
 
 # Example Usage
 
@@ -145,7 +146,7 @@ loadstar --port /dev/ttyUSB0 --high-speed --tare --duration 10 --units kilogram 
 ```
 
 
-<a id="orgcafb04d"></a>
+<a id="org02d0117"></a>
 
 # Installation
 
@@ -241,14 +242,9 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="org2c2f5ae"></a>
+<a id="org70fbaec"></a>
 
 # Development
-
-
-## Install Guix
-
-[Install Guix](https://guix.gnu.org/manual/en/html_node/Binary-Installation.html)
 
 
 ## Clone Repository
@@ -259,94 +255,153 @@ cd loadstar_sensors_interface_python
 ```
 
 
-## Make alias
+## Guix
+
+
+### Install Guix
+
+[Install Guix](https://guix.gnu.org/manual/en/html_node/Binary-Installation.html)
+
+
+### Edit metadata.org
 
 ```sh
-source .metadata/.alias
+make -f .metadata/Makefile metadata-edits
 ```
 
 
-## Edit metadata.org
+### Tangle metadata.org
 
 ```sh
-,make metadata-edits
+make -f .metadata/Makefile metadata
 ```
 
 
-## Tangle metadata.org
+### Develop Python package
 
 ```sh
-,make metadata
+make -f .metadata/Makefile guix-dev-container
+exit
 ```
 
 
-## Test Python package using ipython shell
+### Test Python package using ipython shell
 
 ```sh
-,make guix-dev-container-ipython
+make -f .metadata/Makefile guix-dev-container-ipython
 import loadstar_sensors_interface
 exit
 ```
 
 
-## Test installation of Guix package
+### Test Python package installation
 
 ```sh
-,make guix-container
+make -f .metadata/Makefile guix-container
 exit
 ```
 
 
-## Upload Python package to pypi
+### Upload Python package to pypi
 
 ```sh
-,make upload
+make -f .metadata/Makefile upload
 ```
 
 
-## Test direct device interaction using serial terminal
+### Test direct device interaction using serial terminal
+
+1.  Low Speed
+
+    DI-100, DI-1000
+    
+    ```sh
+    make -f .metadata/Makefile guix-dev-container-port-serial # PORT=/dev/ttyUSB0
+    # make -f .metadata/Makefile PORT=/dev/ttyUSB1 guix-dev-container-port-serial
+    ? # help
+    settings
+    [C-a][C-x] # to exit
+    ```
+
+2.  High Speed
+
+    DI-1000UHS
+    
+    ```sh
+    make -f .metadata/Makefile guix-dev-container-port-serial-hs # PORT=/dev/ttyUSB0
+    # make -f .metadata/Makefile PORT=/dev/ttyUSB1 guix-dev-container-port-serial-hs
+    ? # help
+    settings
+    [C-a][C-x] # to exit
+    ```
 
 
-### Low Speed
-
-DI-100, DI-1000
-
-```sh
-,make guix-dev-container-port-serial # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 guix-dev-container-port-serial
-? # help
-settings
-[C-a][C-x] # to exit
-```
-
-
-### High Speed
-
-DI-1000UHS
-
-```sh
-,make guix-dev-container-port-serial-hs # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 guix-dev-container-port-serial-hs
-? # help
-settings
-[C-a][C-x] # to exit
-```
-
-
-## Test Python package using ipython shell and serial port
+### Test Python package using ipython shell with serial port access
 
 ```sh
-,make guix-dev-container-port-ipython # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 guix-dev-container-port-ipython
+make -f .metadata/Makefile guix-dev-container-port-ipython # PORT=/dev/ttyUSB0
+# make -f .metadata/Makefile PORT=/dev/ttyUSB1 guix-dev-container-port-ipython
 import loadstar_sensors_interface
 exit
 ```
 
 
-## Test installation of Guix package and serial port
+### Test Python package installation with serial port access
 
 ```sh
-,make guix-container-port # PORT=/dev/ttyUSB0
-# ,make PORT=/dev/ttyUSB1 guix-container-port
+make -f .metadata/Makefile guix-container-port # PORT=/dev/ttyUSB0
+# make -f .metadata/Makefile PORT=/dev/ttyUSB1 guix-container-port
+exit
+```
+
+
+## Docker
+
+
+### Install Docker Engine
+
+<https://docs.docker.com/engine/>
+
+
+### Develop Python package
+
+```sh
+make -f .metadata/Makefile docker-dev-container
+exit
+```
+
+
+### Test Python package using ipython shell
+
+```sh
+make -f .metadata/Makefile docker-dev-container-ipython
+import loadstar_sensors_interface
+exit
+```
+
+
+### Test Python package installation
+
+```sh
+make -f .metadata/Makefile docker-container
+exit
+```
+
+
+### Test Python package using ipython shell with serial port access
+
+```sh
+make -f .metadata/Makefile docker-dev-container-port-ipython # PORT=/dev/ttyUSB0
+# make -f .metadata/Makefile PORT=/dev/ttyUSB1 docker-dev-container-port-ipython
+import loadstar_sensors_interface
+exit
+```
+
+
+### Test Python package installation with serial port access
+
+```sh
+make -f .metadata/Makefile docker-container-port # PORT=/dev/ttyUSB0
+# make -f .metadata/Makefile PORT=/dev/ttyUSB1 docker-container-port
 exit
 ```
