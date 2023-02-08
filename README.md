@@ -1,22 +1,22 @@
-- [About](#org8b7274e)
-- [Example Usage](#org5611217)
-- [Installation](#org0e4ec54)
-- [Development](#orgc008076)
+- [About](#orgb9b45a7)
+- [Example Usage](#orgf29dd8a)
+- [Installation](#org4721449)
+- [Development](#org80c6eb3)
 
     <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="org8b7274e"></a>
+<a id="orgb9b45a7"></a>
 
 # About
 
 ```markdown
 - Python Package Name: loadstar_sensors_interface
 - Description: Python async interface to Loadstar Sensors USB devices.
-- Version: 2.0.0
+- Version: 2.1.0
 - Python Version: 3.9
-- Release Date: 2023-02-07
+- Release Date: 2023-02-08
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -37,7 +37,7 @@
 ```
 
 
-<a id="org5611217"></a>
+<a id="orgf29dd8a"></a>
 
 # Example Usage
 
@@ -49,7 +49,7 @@ from loadstar_sensors_interface import LoadstarSensorsInterface
 import asyncio
 
 async def my_sensor_value_callback(sensor_value):
-    print(f'my_sensor_value_callback: {sensor_value}')
+    print(f'sensor value magnitude: {sensor_value.magnitude}, units: {sensor_value.units}')
     await asyncio.sleep(0)
 
 async def example():
@@ -146,7 +146,7 @@ loadstar --port /dev/ttyUSB0 --high-speed --tare --duration 10 --units kilogram 
 ```
 
 
-<a id="org0e4ec54"></a>
+<a id="org4721449"></a>
 
 # Installation
 
@@ -242,7 +242,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="orgc008076"></a>
+<a id="org80c6eb3"></a>
 
 # Development
 

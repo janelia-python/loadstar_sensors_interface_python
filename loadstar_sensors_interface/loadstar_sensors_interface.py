@@ -3,11 +3,23 @@ import asyncio
 import serial_asyncio
 import pint
 import time
+from dataclasses import dataclass, fields
 
 
-async def sensor_value_callback(sensor_value):
-    print(f'sensor_value_callback: {sensor_value}')
+async def dummy_sensor_value_callback(sensor_value):
+    print(f'dummy_sensor_value_callback: {sensor_value}')
     await asyncio.sleep(0)
+
+@dataclass
+class DeviceInfo:
+    """Loadstar Sensors device information."""
+    port: str = ''
+    baudrate: int = 0
+    model: str = ''
+    id: str = ''
+    sensor_value_units: str = ''
+    units_format: str = ''
+    load_capacity: float = 0.0
 
 class LoadstarSensorsInterface():
     """Loadstar Sensors USB device."""
@@ -17,6 +29,7 @@ class LoadstarSensorsInterface():
     _TARE_RESPONSE = b'Tared'
     _MAX_TRY_COUNT = 10
     _GOOD_RESPONSE = b'A'
+    _BAD_RESPONSE = b'E'
     _READ_TIMEOUT = 1.0
     _TARE_SLEEP = 1.0
     units = pint.UnitRegistry()
@@ -88,10 +101,15 @@ class LoadstarSensorsInterface():
 
     async def _write_read(self, request=b''):
         """Write request to device then read response from device."""
-        async with self._write_read_lock:
-            await self._write(request)
-            response = await self._read()
-            return response
+        response = self._BAD_RESPONSE
+        if not self._getting_sensor_values:
+            async with self._write_read_lock:
+                try_count = 0
+                while try_count < self._MAX_TRY_COUNT and response == self._BAD_RESPONSE:
+                    try_count += 1
+                    await self._write(request)
+                    response = await self._read()
+        return response
 
     async def _read_until_no_response(self):
         """Keep reading until no response from device to clear buffer."""
@@ -132,7 +150,7 @@ class LoadstarSensorsInterface():
         except asyncio.CancelledError:
             self._debug_print(f'_getting_sensor_values_loop canceled')
 
-    def start_getting_sensor_values(self, callback=sensor_value_callback):
+    def start_getting_sensor_values(self, callback=dummy_sensor_value_callback):
         """Start continuous reading of sensor values from device."""
         if not self._getting_sensor_values:
             self._getting_sensor_values = True
@@ -140,16 +158,21 @@ class LoadstarSensorsInterface():
 
     async def stop_getting_sensor_values(self):
         """Stop continuous reading of sensor values from device."""
-        await self._write()
-        await asyncio.sleep(0.05)
-        self._getting_sensor_values_task.cancel()
-        self._sensor_value_t_stop = time.perf_counter()
-        self._sensor_value_duration = self._sensor_value_t_stop - self._sensor_value_t_start
-        self._sensor_value_duration *= self._duration_units
-        self._sensor_value_rate = self._sensor_value_count / self._sensor_value_duration
-        self._sensor_value_rate = self._sensor_value_rate.to(self._rate_units)
-        await self._read_until_no_response()
-        self._getting_sensor_values = False
+        if self._getting_sensor_values:
+            await self._write()
+            await asyncio.sleep(0.05)
+            self._getting_sensor_values_task.cancel()
+            self._sensor_value_t_stop = time.perf_counter()
+            self._sensor_value_duration = self._sensor_value_t_stop - self._sensor_value_t_start
+            self._sensor_value_duration *= self._duration_units
+            self._sensor_value_rate = self._sensor_value_count / self._sensor_value_duration
+            self._sensor_value_rate = self._sensor_value_rate.to(self._rate_units)
+            await self._read_until_no_response()
+            self._getting_sensor_values = False
+
+    async def getting_sensor_values(self):
+        """Return True if continuously reading sensor values from device."""
+        return self._getting_sensor_values
 
     def get_sensor_value_count(self):
         """Return number of sensor values gotten between starting and stopping readings."""
@@ -165,23 +188,26 @@ class LoadstarSensorsInterface():
 
     async def get_device_info(self):
         """Query device and return information."""
-        device_info = {}
-        device_info['port'] = self.get_port()
-        device_info['baudrate'] = self.get_baudrate()
-        device_info['model'] = await self.get_model()
-        device_info['id'] = await self.get_id()
-        device_info['sensor_value_units'] = self.get_sensor_value_units()
-        device_info['units_format'] = self.get_units_format()
-        device_info['load_capacity'] = await self.get_load_capacity()
+        device_info = DeviceInfo()
+        if not self._getting_sensor_values:
+            device_info.port = self.get_port()
+            device_info.baudrate = self.get_baudrate()
+            device_info.model = await self.get_model()
+            device_info.id = await self.get_id()
+            device_info.sensor_value_units = self.get_sensor_value_units()
+            device_info.units_format = self.get_units_format()
+            device_info.load_capacity = await self.get_load_capacity()
         return device_info
 
-    async def print_device_info(self, additional_device_info={}):
+    # pretty printing of dataclasses only added in Python 3.10
+    async def print_device_info(self):
         """Query device and print information."""
         device_info = await self.get_device_info()
-        device_info.update(additional_device_info)
         print('device info:')
-        for key, value in device_info.items():
-            print(f'{key:<25}{value}')
+        for field in fields(device_info):
+            name = field.name
+            value = getattr(device_info, field.name)
+            print(f'{name:<25}{value}')
         print('')
 
     async def tare(self):
