@@ -65,6 +65,7 @@ class LoadstarSensorsInterface():
         self._baudrate = baudrate
         self._reader, self._writer = await serial_asyncio.open_serial_connection(url=port, baudrate=baudrate)
         self._debug_print(f'serial connection opened with port: {port}, baudrate: {baudrate}')
+        await self._write_read() # stop continuous sensor values if necessary
         await self._read_until_no_response()
         await self._write_empty_request_until_good_response()
         await self._get_native_units()

@@ -1,22 +1,22 @@
-- [About](#org858042c)
-- [Example Usage](#orgb254145)
-- [Installation](#org3456ebb)
-- [Development](#orgcf88a37)
+- [About](#org9e40317)
+- [Example Usage](#orga7278d3)
+- [Installation](#org2c7740c)
+- [Development](#orgf26af19)
 
     <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="org858042c"></a>
+<a id="org9e40317"></a>
 
 # About
 
 ```markdown
 - Python Package Name: loadstar_sensors_interface
 - Description: Python async interface to Loadstar Sensors USB devices.
-- Version: 2.1.0
+- Version: 2.1.1
 - Python Version: 3.9
-- Release Date: 2023-02-08
+- Release Date: 2023-02-09
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
 - URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
@@ -37,7 +37,7 @@
 ```
 
 
-<a id="orgb254145"></a>
+<a id="orga7278d3"></a>
 
 # Example Usage
 
@@ -86,7 +86,7 @@ loadstar --help
 #   -p, --port TEXT          Device name (e.g. /dev/ttyUSB0 on GNU/Linux or COM3
 #                            on Windows)
 #   -H, --high-speed         Open serial port with high speed baudrate.
-#   -d, --debug              Print debugging information.
+#   --debug                  Print debugging information.
 #   -i, --info               Print the device info and exit
 #   -T, --tare               Tare before getting sensor values.
 #   -d, --duration INTEGER   Duration of sensor value measurements in seconds.
@@ -146,7 +146,7 @@ loadstar --port /dev/ttyUSB0 --high-speed --tare --duration 10 --units kilogram 
 ```
 
 
-<a id="org3456ebb"></a>
+<a id="org2c7740c"></a>
 
 # Installation
 
@@ -242,7 +242,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="orgcf88a37"></a>
+<a id="orgf26af19"></a>
 
 # Development
 

@@ -19,7 +19,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
               is_flag=True,
               default=False,
               help='Open serial port with high speed baudrate.')
-@click.option('-d', '--debug',
+@click.option('--debug',
               is_flag=True,
               default=False,
               help='Print debugging information.')
