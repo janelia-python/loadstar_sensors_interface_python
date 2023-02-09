@@ -1,13 +1,13 @@
-- [About](#org9e40317)
-- [Example Usage](#orga7278d3)
-- [Installation](#org2c7740c)
-- [Development](#orgf26af19)
+- [About](#org945ae43)
+- [Example Usage](#orge8b25df)
+- [Installation](#org5bf83b1)
+- [Development](#orgaa757a1)
 
     <!-- This file is generated automatically from metadata -->
     <!-- File edits may be overwritten! -->
 
 
-<a id="org9e40317"></a>
+<a id="org945ae43"></a>
 
 # About
 
@@ -37,7 +37,7 @@
 ```
 
 
-<a id="orga7278d3"></a>
+<a id="orge8b25df"></a>
 
 # Example Usage
 
@@ -146,7 +146,7 @@ loadstar --port /dev/ttyUSB0 --high-speed --tare --duration 10 --units kilogram 
 ```
 
 
-<a id="org2c7740c"></a>
+<a id="org5bf83b1"></a>
 
 # Installation
 
@@ -242,7 +242,7 @@ The Python code in this library may be installed in any number of ways, chose on
     ```
 
 
-<a id="orgf26af19"></a>
+<a id="orgaa757a1"></a>
 
 # Development
 

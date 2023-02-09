@@ -662,7 +662,7 @@ guix-container:
 requirements.txt:
 	$(GUIX-DEV-CONTAINER) -- $(VENV-SHELL);\
 	pip install .;\
-	pip freeze --exclude <<python-package-name>> > requirements.txt;\
+	pip freeze --local --exclude <<python-package-name>> > requirements.txt;\
 	deactivate;\
 	rm -rf .venv
 

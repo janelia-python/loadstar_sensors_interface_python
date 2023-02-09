@@ -34,7 +34,7 @@ guix-container:
 requirements.txt:
 	$(GUIX-DEV-CONTAINER) -- $(VENV-SHELL);\
 	pip install .;\
-	pip freeze --exclude loadstar_sensors_interface > requirements.txt;\
+	pip freeze --local --exclude loadstar_sensors_interface > requirements.txt;\
 	deactivate;\
 	rm -rf .venv
 
