@@ -921,12 +921,12 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #+END_SRC
 
-#+HEADER: :tangle (if tangle-external-files "../LICENSE" "no")
-#+BEGIN_SRC text :exports none :noweb yes
+#+BEGIN_SRC text :tangle LICENSE :exports none :noweb yes
 <<license-text>>
 #+END_SRC
 
-#+BEGIN_SRC text :tangle LICENSE :exports none :noweb yes
+#+HEADER: :tangle (if tangle-external-files "../LICENSE" "no")
+#+BEGIN_SRC text :exports none :noweb yes
 <<license-text>>
 #+END_SRC
 
