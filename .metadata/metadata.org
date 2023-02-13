@@ -120,7 +120,7 @@ github.com
 https://<<forge>>/<<repository-organization>>/<<repository-name>>
 #+END_SRC
 
-#+NAME: git-clone-url
+#+NAME: git-clone-url-ssh
 #+BEGIN_SRC text :exports none :noweb yes
 git@<<forge>>:<<repository-organization>>/<<repository-name>>.git
 #+END_SRC
@@ -382,7 +382,7 @@ pip install <<python-package-name>>
 ** Clone Repository
 
 #+BEGIN_SRC sh :noweb yes
-git clone <<git-clone-url>>
+git clone <<git-clone-url-ssh>>
 cd <<repository-name>>
 #+END_SRC
 
