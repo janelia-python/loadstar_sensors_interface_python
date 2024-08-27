@@ -19,7 +19,7 @@
 - Release Date: 2023-02-09
 - Creation Date: 2022-08-16
 - License: BSD-3-Clause
-- URL: https://github.com/janelia-pypi/loadstar_sensors_interface_python
+- URL: https://github.com/janelia-python/loadstar_sensors_interface_python
 - Author: Peter Polidoro
 - Email: peter@polidoro.io
 - Copyright: 2023 Howard Hughes Medical Institute
@@ -150,7 +150,7 @@ loadstar --port /dev/ttyUSB0 --high-speed --tare --duration 10 --units kilogram 
 
 # Installation
 
-<https://github.com/janelia-pypi/python_setup>
+<https://github.com/janelia-python/python_setup>
 
 
 ## GNU/Linux
@@ -250,7 +250,7 @@ The Python code in this library may be installed in any number of ways, chose on
 ## Clone Repository
 
 ```sh
-git clone git@github.com:janelia-pypi/loadstar_sensors_interface_python.git
+git clone git@github.com:janelia-python/loadstar_sensors_interface_python.git
 cd loadstar_sensors_interface_python
 ```
 
